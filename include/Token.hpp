@@ -9,13 +9,18 @@ enum class TokenType
     MINUS,
     STAR,
     SLASH,
+    IDENTIFIER,
+    STRING,
     NUMBER,
-    END
+    EOF_TOKEN
 };
 
 struct Token
 {
     TokenType type;
     std::string lexeme;
-    int line;
+    int line_number;
+
+    Token(TokenType type, std::string lexeme, int line_number)
+        : type(type), lexeme(lexeme), line_number(line_number) {}
 };
