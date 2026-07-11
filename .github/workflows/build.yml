@@ -1,17 +1,14 @@
 name: C++ CI Build
+
 on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-  steps:
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      -name: Build with Make
+      - name: Build with Make
         run: make
-      
-      - name: Run test
+      - name: Run Test
         run: ./compiler
-
