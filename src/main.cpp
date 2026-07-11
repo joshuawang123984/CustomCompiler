@@ -65,6 +65,6 @@ void run(const std::string &source)
     Parser parser(tokens);
     Expr *expression = parser.parse();
 
-    if (Reporter::hadError)
+    if (ErrorReporter::hadError)
         return;
 }
