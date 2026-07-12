@@ -62,8 +62,22 @@ void run(const std::string &source)
     Lexer lexer(source);
     std::vector<Token> tokens = lexer.scanTokens();
 
-    Parser parser(tokens);
-    Expr *expression = parser.parse();
+    for (const auto &token : tokens)
+    {
+        std::cout << "[" << static_cast<int>(token.type) << "] '"
+                  << token.lexeme << "'";
+
+        std::visit([](auto &&val)
+                   {
+        using T = std::decay_t<decltype(val)>;
+        if constexpr (!std::is_same_v<T, std::monostate>)
+            std::cout << " (" << val << ")"; }, token.literal);
+
+        std::cout << " line " << token.line_number << "\n";
+    }
+
+    // Parser parser(tokens);
+    // Expr *expression = parser.parse();
 
     if (ErrorReporter::hadError)
         return;
