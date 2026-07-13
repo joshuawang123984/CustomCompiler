@@ -1,6 +1,10 @@
 #include "../include/Parser.hpp"
 #include "../include/Token.hpp"
 
+Expr *parse()
+{
+}
+
 Token Parser::peek()
 {
 }

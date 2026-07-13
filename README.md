@@ -1,4 +1,4 @@
-# C++ Compiler Project
+# C++ Custom Compiler 
 
 A custom-built compiler project focused on implementing a recursive descent parser and an expression evaluator from scratch. This project contains fundamental stages of compilation: Lexing, Parsing, and Evaluation. Inspired by CraftingInterpreters by Robert Nystrom.
 

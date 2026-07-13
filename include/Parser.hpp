@@ -1,8 +1,7 @@
 #pragma once
 #include <vector>
 #include "Token.hpp"
-
-class Expr;
+#include "Expr.hpp"
 
 class Parser
 {
