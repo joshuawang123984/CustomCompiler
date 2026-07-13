@@ -6,10 +6,12 @@
 #include "../include/Lexer.hpp"
 #include "../include/Parser.hpp"
 #include "../include/ErrorReporter.hpp"
+#include "../include/ASTPrinter.hpp"
 
 void runFile(const std::string &path);
 void runPrompt();
 void run(const std::string &source);
+void testASTPrinter();
 
 int main(int argc, char *argv[])
 {
@@ -26,7 +28,8 @@ int main(int argc, char *argv[])
 
     else
     {
-        runPrompt();
+        // runPrompt();
+        testASTPrinter();
     }
 
     return 0;
@@ -81,4 +84,23 @@ void run(const std::string &source)
 
     if (ErrorReporter::hadError)
         return;
+}
+
+void testASTPrinter()
+{
+    // testing with inputs: (-123) * (45.67)
+
+    auto l123 = std::make_unique<Literal>(123.0);
+    auto unary = std::make_unique<Unary>(Token(TokenType::MINUS, "-", 0), std::move(l123));
+    auto grouping = std::make_unique<Grouping>(std::move(unary));
+    auto l45 = std::make_unique<Literal>(45.67);
+
+    auto expr = std::make_unique<Binary>(
+        std::move(grouping),
+        Token(TokenType::STAR, "*", 0),
+        std::move(l45));
+
+    ASTPrinter printer;
+    expr->accept(printer);
+    std::cout << std::endl;
 }
