@@ -45,7 +45,7 @@ enum class TokenType
     EOF_TOKEN
 };
 
-using LiteralValue = std::variant<std::monostate, double, std::string>;
+using LiteralValue = std::variant<std::monostate, double, std::string, bool>;
 
 struct Token
 {

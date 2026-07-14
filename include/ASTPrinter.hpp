@@ -10,6 +10,7 @@ struct ASTPrinter : public Visitor
     {
         std::cout << "(" << expr.op.lexeme << " ";
         expr.left->accept(*this);
+        std::cout << " ";
         expr.right->accept(*this);
         std::cout << ")";
     }

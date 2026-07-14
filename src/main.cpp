@@ -12,6 +12,7 @@ void runFile(const std::string &path);
 void runPrompt();
 void run(const std::string &source);
 void testASTPrinter();
+void testParser();
 
 int main(int argc, char *argv[])
 {
@@ -29,7 +30,7 @@ int main(int argc, char *argv[])
     else
     {
         // runPrompt();
-        testASTPrinter();
+        testParser();
     }
 
     return 0;
@@ -103,4 +104,28 @@ void testASTPrinter()
     ASTPrinter printer;
     expr->accept(printer);
     std::cout << std::endl;
+}
+
+void testParser()
+{
+    std::string source = "1 + 2 * 3";
+
+    Lexer scanner(source);
+    std::vector<Token> tokens = scanner.scanTokens();
+
+    Parser parser(tokens);
+    std::unique_ptr<Expr> expression = parser.parse();
+
+    if (expression)
+    {
+        ASTPrinter printer;
+        std::cout << "AST Structure: ";
+
+        expression->accept(printer);
+        std::cout << std::endl;
+    }
+    else
+    {
+        std::cout << "Parsing failed." << std::endl;
+    }
 }
