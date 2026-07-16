@@ -1,34 +1,10 @@
 #include <iostream>
 #include "../include/Scanner.hpp"
 
-bool Scanner::isAtEnd() const
-{
-    return current >= source.length();
-}
-bool Scanner::match(char expected)
-{
-    if (isAtEnd())
-        return false;
+Scanner::Scanner(const std::string &source) : source(source), tokenVector(source, &current, &start) {}
+const TokenVector &Scanner::getTokens() const { return tokenVector; }
+const std::string &Scanner::getSource() const { return source; }
 
-    return source[current++] == expected;
-}
-char Scanner::peek()
-{
-    if (isAtEnd())
-        return '\0';
-
-    return source[current];
-}
-char Scanner::peekNext()
-{
-    if (current + 1 > source.length())
-        return '\0';
-    return source[current + 1];
-}
-char Scanner::advance()
-{
-    return source[current++];
-}
 bool Scanner::isDigit(char c)
 {
     return (c >= '0' && c <= '9');
@@ -42,129 +18,115 @@ bool Scanner::isAlphaNumeric(char c)
 {
     return isAlpha(c) || isDigit(c);
 }
-void Scanner::addToken(TokenType type)
-{
-    std::string text = source.substr(start, current - start);
-    tokens.emplace_back(type, text, line);
-}
-void Scanner::addToken(TokenType type, double literal)
-{
-    std::string text = source.substr(start, current - start);
-    tokens.emplace_back(type, text, literal, line);
-}
-void Scanner::addToken(TokenType type, std::string literal)
-{
-    std::string text = source.substr(start, current - start);
-    tokens.emplace_back(type, text, literal, line);
-}
+
 void Scanner::number()
 {
-    while (isDigit(peek()))
-        advance();
+    while (isDigit(tokenVector.char_peek()))
+        tokenVector.char_advance();
 
-    if (peek() == '.' && isDigit(peekNext()))
+    if (tokenVector.char_peek() == '.' && isDigit(tokenVector.peekNext()))
     {
-        advance();
-        while (isDigit(peek()))
-            advance();
+        tokenVector.char_advance();
+        while (isDigit(tokenVector.char_peek()))
+            tokenVector.char_advance();
     }
 
     std::string num = source.substr(start, current - start);
-    addToken(TokenType::NUMBER, std::stod(num));
+    tokenVector.addToken(TokenType::NUMBER, std::stod(num), line);
 }
 
 void Scanner::string()
 {
-    while (peek() != '"' && !isAtEnd())
+    while (tokenVector.char_peek() != '"' && !tokenVector.isAtEnd())
     {
-        if (peek() != '\n')
+        if (tokenVector.char_peek() != '\n')
             line++;
     }
 
-    if (isAtEnd())
+    if (tokenVector.isAtEnd())
     {
         // implement an error class later rathern than print
         std::cerr << "Unterminated String." << std::endl;
         return;
     }
 
-    advance();
+    tokenVector.char_advance();
 
     std::string text = source.substr(start + 1, current - start - 2);
-    addToken(TokenType::STRING, text);
+    tokenVector.addToken(TokenType::STRING, text, line);
 }
 void Scanner::identifier()
 {
-    while (isAlphaNumeric(peek()))
-        advance();
+    while (isAlphaNumeric(tokenVector.char_peek()))
+        tokenVector.char_advance();
 
     std::string identifier = source.substr(start, current - start);
     auto it = keywords.find(identifier);
 
     // checks if token was found. if not, its an identifier. if is, extract value of key from keywords map
     TokenType type = (it == keywords.end()) ? TokenType::IDENTIFIER : it->second;
-    addToken(type);
+    tokenVector.addToken(type, line);
 }
 void Scanner::scanToken()
 {
-    char c = advance();
+    char c = tokenVector.char_advance();
 
     switch (c)
     {
     case '(':
-        addToken(TokenType::LEFT_PAREN);
+        tokenVector.addToken(TokenType::LEFT_PAREN, line);
         break;
     case ')':
-        addToken(TokenType::RIGHT_PAREN);
+        tokenVector.addToken(TokenType::RIGHT_PAREN, line);
         break;
     case '{':
-        addToken(TokenType::LEFT_BRACE);
+        tokenVector.addToken(TokenType::LEFT_BRACE, line);
         break;
     case '}':
-        addToken(TokenType::RIGHT_BRACE);
+        tokenVector.addToken(TokenType::RIGHT_BRACE, line);
         break;
     case ',':
-        addToken(TokenType::COMMA);
+        tokenVector.addToken(TokenType::COMMA, line);
         break;
     case '.':
-        addToken(TokenType::DOT);
+        tokenVector.addToken(TokenType::DOT, line);
         break;
     case '-':
-        addToken(TokenType::MINUS);
+        tokenVector.addToken(TokenType::MINUS, line);
         break;
     case '+':
-        addToken(TokenType::PLUS);
+        tokenVector.addToken(TokenType::PLUS, line);
         break;
     case ';':
-        addToken(TokenType::SEMICOLON);
+        tokenVector.addToken(TokenType::SEMICOLON, line);
         break;
     case '*':
-        addToken(TokenType::STAR);
+        tokenVector.addToken(TokenType::STAR, line);
         break;
 
     case '!':
-        addToken(match('=') ? TokenType::NOT_EQUAL : TokenType::NOT);
+        tokenVector.addToken(tokenVector.char_match('=') ? TokenType::NOT_EQUAL : TokenType::NOT, line);
         break;
     case '=':
-        addToken(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);
+        tokenVector.addToken(tokenVector.char_match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL, line);
         break;
     case '<':
-        addToken(match('=') ? TokenType::LESS_EQUAL : TokenType::LESS);
+        tokenVector.addToken(tokenVector.char_match('=') ? TokenType::LESS_EQUAL : TokenType::LESS, line);
         break;
     case '>':
-        addToken(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
+        tokenVector.addToken(tokenVector.char_match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER, line);
         break;
 
     case '/':
         // if comment, skip
-        if (match('/'))
+        if (tokenVector.char_match('/'))
         {
-            while (peek() != '\n' && !isAtEnd())
-                advance();
+            while (tokenVector.char_peek() != '\n' && !tokenVector.isAtEnd())
+                tokenVector.char_advance();
         }
         else
         {
-            addToken(TokenType::SLASH);
+            tokenVector.addToken(TokenType::SLASH, line);
         }
         break;
 
@@ -198,17 +160,13 @@ void Scanner::scanToken()
     }
 }
 
-Scanner::Scanner(const std::string &source) : source(source) {}
-std::vector<Token> Scanner::scanTokens()
+TokenVector Scanner::scanTokens()
 {
-    while (!isAtEnd())
+    while (!tokenVector.isAtEnd())
     {
         start = current;
         scanToken();
     }
-    tokens.emplace_back(TokenType::EOF_TOKEN, "", line);
-    return tokens;
+    tokenVector.addEOF(line);
+    return tokenVector;
 }
-
-const std::vector<Token> &Scanner::getTokens() const { return tokens; }
-const std::string &Scanner::getSource() const { return source; }

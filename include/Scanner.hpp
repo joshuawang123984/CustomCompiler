@@ -3,19 +3,20 @@
 #include <vector>
 #include <map>
 #include "Token.hpp"
+#include "TokenVector.hpp"
 
 class Scanner
 {
 public:
     explicit Scanner(const std::string &source);
-    std::vector<Token> scanTokens();
+    TokenVector scanTokens();
 
-    const std::vector<Token> &getTokens() const;
+    const TokenVector &getTokens() const;
     const std::string &getSource() const;
 
 private:
     std::string source;
-    std::vector<Token> tokens;
+    TokenVector tokenVector;
     int start = 0;
     int current = 0;
     int line = 1;
@@ -35,17 +36,11 @@ private:
                                                  {"true", TokenType::TRUE},
                                                  {"var", TokenType::VAR},
                                                  {"while", TokenType::WHILE}};
-    bool isAtEnd() const;
-    bool match(char expected);
-    char peek();
-    char peekNext();
-    char advance();
+
     bool isDigit(char c);
     bool isAlpha(char c);
     bool isAlphaNumeric(char c);
-    void addToken(TokenType type);
-    void addToken(TokenType type, double literal);
-    void addToken(TokenType type, std::string literal);
+
     void number();
     void string();
     void identifier();

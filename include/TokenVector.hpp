@@ -7,15 +7,10 @@
 class TokenVector
 {
 public:
-    explicit TokenVector(std::string &source);
+    explicit TokenVector(const std::string &source, int *current, int *start);
 
     const std::vector<Token> &getTokens() const;
     const std::string &getSource() const;
-
-private:
-    std::vector<Token> tokens;
-    std::string source;
-    int current = 0;
 
     bool isAtEnd() const;
     bool check(TokenType type);
@@ -29,8 +24,14 @@ private:
     Token previous();
     // maybe add consume as well
 
-    void addToken(TokenType type, int start, int line);
-    void addToken(TokenType type, double literal, int start, int line);
-    void addToken(TokenType type, std::string literal, int start, int line);
-    void scanToken();
+    void addToken(TokenType type, int line);
+    void addToken(TokenType type, double literal, int line);
+    void addToken(TokenType type, std::string literal, int line);
+    void addEOF(int line);
+
+private:
+    std::vector<Token> tokens;
+    std::string source;
+    int *current;
+    int *start;
 };

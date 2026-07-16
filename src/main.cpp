@@ -5,7 +5,7 @@
 #include "../include/Token.hpp"
 #include "../include/Scanner.hpp"
 
-void printTokens(const std::vector<Token> &tokens);
+void printTokens(const TokenVector &tokens);
 void runFile(const std::string &path);
 void runPrompt();
 void run(const std::string &source);
@@ -32,9 +32,10 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void printTokens(const std::vector<Token> &tokens)
+void printTokens(const TokenVector &tokens)
 {
-    for (const auto &token : tokens)
+
+    for (const auto &token : tokens.getTokens())
     {
         std::cout
             << " | Lexeme: " << token.lexeme
@@ -73,7 +74,7 @@ void run(const std::string &source)
 
 void testScanner()
 {
-    std::string sourceCode = "var x = 10;";
+    std::string sourceCode = "var x = 10;;;";
     Scanner scanner(sourceCode);
 
     scanner.scanTokens();
