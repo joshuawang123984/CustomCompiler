@@ -49,16 +49,17 @@ using LiteralValue = std::variant<std::monostate, double, std::string, bool>;
 
 struct Token
 {
+public:
     TokenType type;
     std::string lexeme;
     const LiteralValue literal;
-    int line_number;
+    int line;
 
     Token(TokenType type, std::string lexeme, int line_number)
-        : type(type), lexeme(lexeme), line_number(line_number) {}
+        : type(type), lexeme(lexeme), line(line_number) {}
 
     Token(TokenType type, std::string lexeme, LiteralValue literal, int line_number)
-        : type(type), lexeme(lexeme), literal(std::move(literal)), line_number(line_number) {}
+        : type(type), lexeme(lexeme), literal(std::move(literal)), line(line_number) {}
 
     std::string toString() const
     {

@@ -1,66 +1,63 @@
-#include "../include/Lexer.hpp"
-#include "../include/Token.hpp"
-#include "../include/ErrorReporter.hpp"
+#include <iostream>
+#include "../include/Scanner.hpp"
 
-Lexer::Lexer(const std::string &source) : source(source), start(0), current(0), line(1) {}
-
-bool Lexer::isAtEnd() const
+bool Scanner::isAtEnd() const
 {
     return current >= source.length();
 }
-
-bool Lexer::match(char expected)
+bool Scanner::match(char expected)
 {
     if (isAtEnd())
         return false;
-    if (source[current] != expected)
-        return false;
 
-    current++;
-    return true;
+    return source[current++] == expected;
 }
-
-char Lexer::peek()
+char Scanner::peek()
 {
     if (isAtEnd())
         return '\0';
+
     return source[current];
 }
-
-char Lexer::peekNext()
+char Scanner::peekNext()
 {
-    if (current + 1 >= source.length())
+    if (current + 1 > source.length())
         return '\0';
     return source[current + 1];
 }
-
-void Lexer::string()
+char Scanner::advance()
 {
-    while (peek() != '"' && !isAtEnd())
-    {
-        if (peek() == '\n')
-            line++;
-        advance();
-    }
-
-    if (isAtEnd())
-    {
-        ErrorReporter::error(line, "Unterminated string.");
-        return;
-    }
-
-    advance();
-
-    std::string value = source.substr(start + 1, current - start - 2);
-    addToken(TokenType::STRING, value);
+    return source[current++];
+}
+bool Scanner::isDigit(char c)
+{
+    return (c >= '0' && c <= '9');
 }
 
-bool Lexer::isDigit(char c)
+bool Scanner::isAlpha(char c)
 {
-    return c >= '0' && c <= '9';
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
 }
-
-void Lexer::number()
+bool Scanner::isAlphaNumeric(char c)
+{
+    return isAlpha(c) || isDigit(c);
+}
+void Scanner::addToken(TokenType type)
+{
+    std::string text = source.substr(start, current - start);
+    tokens.emplace_back(type, text, line);
+}
+void Scanner::addToken(TokenType type, double literal)
+{
+    std::string text = source.substr(start, current - start);
+    tokens.emplace_back(type, text, literal, line);
+}
+void Scanner::addToken(TokenType type, std::string literal)
+{
+    std::string text = source.substr(start, current - start);
+    tokens.emplace_back(type, text, literal, line);
+}
+void Scanner::number()
 {
     while (isDigit(peek()))
         advance();
@@ -72,50 +69,43 @@ void Lexer::number()
             advance();
     }
 
-    std::string text = source.substr(start, current - start);
-    addToken(TokenType::NUMBER, std::stod(text));
+    std::string num = source.substr(start, current - start);
+    addToken(TokenType::NUMBER, std::stod(num));
 }
 
-char Lexer::advance()
+void Scanner::string()
 {
-    return source[current++];
+    while (peek() != '"' && !isAtEnd())
+    {
+        if (peek() != '\n')
+            line++;
+    }
+
+    if (isAtEnd())
+    {
+        // implement an error class later rathern than print
+        std::cerr << "Unterminated String." << std::endl;
+        return;
+    }
+
+    advance();
+
+    std::string text = source.substr(start + 1, current - start - 2);
+    addToken(TokenType::STRING, text);
 }
-bool Lexer::isAlpha(char c)
-{
-    return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_');
-}
-bool Lexer::isAlphaNumeric(char c)
-{
-    return isAlpha(c) || isDigit(c);
-}
-void Lexer::identifier()
+void Scanner::identifier()
 {
     while (isAlphaNumeric(peek()))
         advance();
 
-    std::string text = source.substr(start, current - start);
-    auto it = keywords.find(text);
-    TokenType type = (it == keywords.end()) ? TokenType::IDENTIFIER : it->second;
+    std::string identifier = source.substr(start, current - start);
+    auto it = keywords.find(identifier);
 
+    // checks if token was found. if not, its an identifier. if is, extract value of key from keywords map
+    TokenType type = (it == keywords.end()) ? TokenType::IDENTIFIER : it->second;
     addToken(type);
 }
-
-void Lexer::addToken(TokenType type)
-{
-    std::string text = source.substr(start, current - start);
-    tokens.emplace_back(type, text, line);
-}
-void Lexer::addToken(TokenType type, double literal)
-{
-    std::string text = source.substr(start, current - start);
-    tokens.emplace_back(type, text, literal, line);
-}
-void Lexer::addToken(TokenType type, std::string literal)
-{
-    std::string text = source.substr(start, current - start);
-    tokens.emplace_back(type, text, literal, line);
-}
-void Lexer::scanToken()
+void Scanner::scanToken()
 {
     char c = advance();
 
@@ -166,6 +156,7 @@ void Lexer::scanToken()
         break;
 
     case '/':
+        // if comment, skip
         if (match('/'))
         {
             while (peek() != '\n' && !isAtEnd())
@@ -201,20 +192,23 @@ void Lexer::scanToken()
 
         else
         {
-            ErrorReporter::error(line, "Unexpected character.");
+            std::cerr << "Unexpected character." << std::endl;
         }
         break;
     }
 }
 
-std::vector<Token> Lexer::scanTokens()
+Scanner::Scanner(const std::string &source) : source(source) {}
+std::vector<Token> Scanner::scanTokens()
 {
     while (!isAtEnd())
     {
         start = current;
         scanToken();
     }
-
     tokens.emplace_back(TokenType::EOF_TOKEN, "", line);
     return tokens;
 }
+
+const std::vector<Token> &Scanner::getTokens() const { return tokens; }
+const std::string &Scanner::getSource() const { return source; }

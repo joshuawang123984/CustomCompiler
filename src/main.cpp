@@ -3,16 +3,13 @@
 #include <string>
 #include <vector>
 #include "../include/Token.hpp"
-#include "../include/Lexer.hpp"
-#include "../include/Parser.hpp"
-#include "../include/ErrorReporter.hpp"
-#include "../include/ASTPrinter.hpp"
+#include "../include/Scanner.hpp"
 
+void printTokens(const std::vector<Token> &tokens);
 void runFile(const std::string &path);
 void runPrompt();
 void run(const std::string &source);
-void testASTPrinter();
-void testParser();
+void testScanner();
 
 int main(int argc, char *argv[])
 {
@@ -29,13 +26,21 @@ int main(int argc, char *argv[])
 
     else
     {
-        // runPrompt();
-        testParser();
+        testScanner();
     }
 
     return 0;
 }
 
+void printTokens(const std::vector<Token> &tokens)
+{
+    for (const auto &token : tokens)
+    {
+        std::cout
+            << " | Lexeme: " << token.lexeme
+            << " | Line: " << token.line << std::endl;
+    }
+}
 void runFile(const std::string &path)
 {
     std::ifstream file(path);
@@ -63,69 +68,16 @@ void runPrompt()
 
 void run(const std::string &source)
 {
-    Lexer lexer(source);
-    std::vector<Token> tokens = lexer.scanTokens();
-
-    for (const auto &token : tokens)
-    {
-        std::cout << "[" << static_cast<int>(token.type) << "] '"
-                  << token.lexeme << "'";
-
-        std::visit([](auto &&val)
-                   {
-        using T = std::decay_t<decltype(val)>;
-        if constexpr (!std::is_same_v<T, std::monostate>)
-            std::cout << " (" << val << ")"; }, token.literal);
-
-        std::cout << " line " << token.line_number << "\n";
-    }
-
-    // Parser parser(tokens);
-    // Expr *expression = parser.parse();
-
-    if (ErrorReporter::hadError)
-        return;
+    return;
 }
 
-void testASTPrinter()
+void testScanner()
 {
-    // testing with inputs: (-123) * (45.67)
+    std::string sourceCode = "var x = 10;";
+    Scanner scanner(sourceCode);
 
-    auto l123 = std::make_unique<Literal>(123.0);
-    auto unary = std::make_unique<Unary>(Token(TokenType::MINUS, "-", 0), std::move(l123));
-    auto grouping = std::make_unique<Grouping>(std::move(unary));
-    auto l45 = std::make_unique<Literal>(45.67);
+    scanner.scanTokens();
 
-    auto expr = std::make_unique<Binary>(
-        std::move(grouping),
-        Token(TokenType::STAR, "*", 0),
-        std::move(l45));
-
-    ASTPrinter printer;
-    expr->accept(printer);
-    std::cout << std::endl;
-}
-
-void testParser()
-{
-    std::string source = "1 + 2 * 3";
-
-    Lexer scanner(source);
-    std::vector<Token> tokens = scanner.scanTokens();
-
-    Parser parser(tokens);
-    std::unique_ptr<Expr> expression = parser.parse();
-
-    if (expression)
-    {
-        ASTPrinter printer;
-        std::cout << "AST Structure: ";
-
-        expression->accept(printer);
-        std::cout << std::endl;
-    }
-    else
-    {
-        std::cout << "Parsing failed." << std::endl;
-    }
+    const auto &tokens = scanner.getTokens();
+    printTokens(tokens);
 }

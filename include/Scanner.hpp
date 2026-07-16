@@ -4,11 +4,14 @@
 #include <map>
 #include "Token.hpp"
 
-class Lexer
+class Scanner
 {
 public:
-    explicit Lexer(const std::string &source);
+    explicit Scanner(const std::string &source);
     std::vector<Token> scanTokens();
+
+    const std::vector<Token> &getTokens() const;
+    const std::string &getSource() const;
 
 private:
     std::string source;
@@ -32,20 +35,19 @@ private:
                                                  {"true", TokenType::TRUE},
                                                  {"var", TokenType::VAR},
                                                  {"while", TokenType::WHILE}};
-
     bool isAtEnd() const;
     bool match(char expected);
     char peek();
     char peekNext();
-    void string();
-    bool isDigit(char c);
-    void number();
     char advance();
+    bool isDigit(char c);
     bool isAlpha(char c);
     bool isAlphaNumeric(char c);
-    void identifier();
     void addToken(TokenType type);
     void addToken(TokenType type, double literal);
     void addToken(TokenType type, std::string literal);
+    void number();
+    void string();
+    void identifier();
     void scanToken();
 };
