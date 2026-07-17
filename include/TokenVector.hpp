@@ -22,7 +22,7 @@ public:
     char char_advance();
     Token token_advance();
     Token previous();
-    // maybe add consume as well
+    Token consume(TokenType type, const std::string &message);
 
     void addToken(TokenType type, int line);
     void addToken(TokenType type, double literal, int line);
@@ -31,7 +31,7 @@ public:
 
 private:
     std::vector<Token> tokens;
-    std::string source;
+    const std::string &source;
     int *current;
     int *start;
 };

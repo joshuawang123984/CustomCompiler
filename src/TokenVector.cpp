@@ -70,7 +70,13 @@ Token TokenVector::previous()
         return Token(TokenType::NIL, "null", -1);
     return tokens.at((*current) - 1);
 }
+Token TokenVector::consume(TokenType type, const std::string &message)
+{
+    if (check(type))
+        return token_advance();
 
+    throw std::runtime_error(message);
+}
 void TokenVector::addToken(TokenType type, int line)
 {
     std::string text = source.substr(*start, *current - *start);
