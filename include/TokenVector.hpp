@@ -8,6 +8,7 @@ class TokenVector
 {
 public:
     explicit TokenVector(const std::string &source, int *current, int *start);
+    explicit TokenVector(TokenVector other, const std::string &source, int *current, int *start);
 
     const std::vector<Token> &getTokens() const;
     const std::string &getSource() const;

@@ -1,6 +1,7 @@
 #include "../include/TokenVector.hpp"
 
 TokenVector::TokenVector(const std::string &source, int *current, int *start) : source(source), current(current), start(start) {}
+TokenVector::TokenVector(TokenVector other, const std::string &source, int *current, int *start) : tokens(other.tokens), source(source), current(current), start(start) {}
 const std::vector<Token> &TokenVector::getTokens() const { return tokens; }
 const std::string &TokenVector::getSource() const { return source; }
 
@@ -94,5 +95,5 @@ void TokenVector::addToken(TokenType type, std::string literal, int line)
 }
 void TokenVector::addEOF(int line)
 {
-    tokens.emplace_back(TokenType::EOF_TOKEN, "-_-", line);
+    tokens.emplace_back(TokenType::EOF_TOKEN, "<EOF>", line);
 }

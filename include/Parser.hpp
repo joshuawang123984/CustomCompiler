@@ -13,7 +13,7 @@ public:
     std::unique_ptr<Expr> parse();
 
 private:
-    const TokenVector &tokenVector;
+    TokenVector tokenVector;
     int current = 0;
 
     std::unique_ptr<Expr> expression();
