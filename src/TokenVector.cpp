@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "../include/TokenVector.hpp"
 
 TokenVector::TokenVector(const std::string &source, int *current, int *start) : source(source), current(current), start(start) {}
@@ -7,7 +8,7 @@ const std::string &TokenVector::getSource() const { return source; }
 
 bool TokenVector::isAtEnd() const
 {
-    return *current >= source.length();
+    return *current >= static_cast<int>(source.length());
 }
 bool TokenVector::check(TokenType type)
 {

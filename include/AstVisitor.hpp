@@ -5,9 +5,9 @@ struct Grouping;
 struct Literal;
 struct Unary;
 
-struct Visitor
+struct AstVisitor
 {
-    virtual ~Visitor() = default;
+    virtual ~AstVisitor() = default;
     virtual void visitBinary(Binary &expr) = 0;
     virtual void visitGrouping(Grouping &expr) = 0;
     virtual void visitLiteral(Literal &expr) = 0;
