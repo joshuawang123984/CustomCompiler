@@ -5,7 +5,7 @@ Value Evaluator::evaluate(Expr &expr)
     return expr.evaluate(*this);
 }
 
-Value Evaluator::visitBinaryExpr(Binary &expr) {}
-Value Evaluator::visitGroupingExpr(Grouping &expr) {}
-Value Evaluator::visitLiteralExpr(Literal &expr) {}
-Value Evaluator::visitUnaryExpr(Unary &expr) {}
+Value Evaluator::visitBinaryExpr(Binary &expr) { return nullptr; }
+Value Evaluator::visitGroupingExpr(Grouping &expr) { return nullptr; }
+Value Evaluator::visitLiteralExpr(Literal &expr) { return nullptr; }
+Value Evaluator::visitUnaryExpr(Unary &expr) { return nullptr; }
