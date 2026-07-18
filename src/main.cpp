@@ -5,6 +5,7 @@
 #include "../include/Token.hpp"
 #include "../include/Scanner.hpp"
 #include "../include/Parser.hpp"
+#include "../include/AstPrinter.hpp"
 #include "../include/Evaluator.hpp"
 
 void printTokens(const TokenVector &tokens);
@@ -105,7 +106,9 @@ std::unique_ptr<Expr> testParse(TokenVector tokens)
     Parser parser(tokens);
     std::unique_ptr<Expr> ast = parser.parse();
 
-    // use AstPrinter here to test results of parsing
+    AstPrinter printer;
+    std::string ast_result = printer.print(*ast);
+    std::cout << "| AstTree Result: " << ast_result << "|" << std::endl;
 
     return ast;
 }
