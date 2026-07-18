@@ -1,13 +1,11 @@
 #pragma once
 #include <memory>
-#include <variant>
+#include "Token.hpp"
 
 struct Binary;
 struct Grouping;
 struct Literal;
 struct Unary;
-
-using Value = std::variant<double, bool, std::string, std::nullptr_t>;
 
 struct EvaluatorVisitor
 {

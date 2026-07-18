@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <variant>
+#include "Types.hpp"
 
 enum class TokenType
 {
@@ -45,20 +45,18 @@ enum class TokenType
     EOF_TOKEN
 };
 
-using LiteralValue = std::variant<std::monostate, double, std::string, bool>;
-
 struct Token
 {
 public:
     TokenType type;
     std::string lexeme;
-    const LiteralValue literal;
+    const Value literal;
     int line;
 
     Token(TokenType type, std::string lexeme, int line_number)
         : type(type), lexeme(lexeme), line(line_number) {}
 
-    Token(TokenType type, std::string lexeme, LiteralValue literal, int line_number)
+    Token(TokenType type, std::string lexeme, Value literal, int line_number)
         : type(type), lexeme(lexeme), literal(std::move(literal)), line(line_number) {}
 
     std::string toString() const

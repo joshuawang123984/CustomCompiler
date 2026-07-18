@@ -46,12 +46,10 @@ struct Grouping : public Expr
     }
 };
 
-using LiteralValue = std::variant<std::monostate, double, std::string, bool>;
-
 struct Literal : public Expr
 {
-    LiteralValue value;
-    Literal(LiteralValue val) : value(val) {}
+    Value value;
+    Literal(Value val) : value(val) {}
 
     void accept(AstVisitor &visitor) override
     {
