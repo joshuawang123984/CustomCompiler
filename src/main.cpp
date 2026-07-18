@@ -5,13 +5,16 @@
 #include "../include/Token.hpp"
 #include "../include/Scanner.hpp"
 #include "../include/Parser.hpp"
+#include "../include/Evaluator.hpp"
 
 void printTokens(const TokenVector &tokens);
+void printValue(Value val);
 void runFile(const std::string &path);
 void runPrompt();
 void run(const std::string &source);
 TokenVector testScanner(const std::string &sourceCode);
 std::unique_ptr<Expr> testParse(TokenVector tokens);
+Value testEvaluator(std::unique_ptr<Expr> ast);
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +35,7 @@ int main(int argc, char *argv[])
         std::string sourceCode = "30 + 10 * 5 * 9 + 301 - 31983 / 3 * (-1 + 4 / 2)";
         TokenVector tokens = testScanner(sourceCode);
         std::unique_ptr<Expr> ast = testParse(tokens);
+        Value result = testEvaluator(std::move(ast));
     }
 
     return 0;
@@ -46,6 +50,12 @@ void printTokens(const TokenVector &tokens)
             << " | Lexeme: " << token.lexeme
             << " | Line: " << token.line << std::endl;
     }
+}
+
+void printValue(Value val)
+{
+    std::visit([](auto &&arg)
+               { std::cout << arg << std::endl; }, val);
 }
 
 void runFile(const std::string &path)
@@ -95,5 +105,16 @@ std::unique_ptr<Expr> testParse(TokenVector tokens)
     Parser parser(tokens);
     std::unique_ptr<Expr> ast = parser.parse();
 
+    // use AstPrinter here to test results of parsing
+
     return ast;
+}
+
+Value testEvaluator(std::unique_ptr<Expr> ast)
+{
+    Evaluator evaluator;
+    Value result = evaluator.evaluate(*ast);
+
+    printValue(result);
+    return result;
 }

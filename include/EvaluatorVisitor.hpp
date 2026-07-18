@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 #include "Token.hpp"
 
 struct Binary;

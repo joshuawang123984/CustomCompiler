@@ -7,7 +7,7 @@
 struct Expr
 {
     virtual ~Expr() = default;
-    virtual void accept(AstVisitor &visitor) = 0;
+    virtual std::string accept(AstVisitor &visitor) = 0;
     virtual Value evaluate(EvaluatorVisitor &visitor) = 0;
 };
 
@@ -19,7 +19,7 @@ struct Binary : public Expr
 
     Binary(std::unique_ptr<Expr> l, Token o, std::unique_ptr<Expr> r) : left(std::move(l)), op(o), right(std::move(r)) {}
 
-    void accept(AstVisitor &visitor) override
+    std::string accept(AstVisitor &visitor) override
     {
         return visitor.visitBinary(*this);
     }
@@ -35,7 +35,7 @@ struct Grouping : public Expr
     std::unique_ptr<Expr> expression;
     Grouping(std::unique_ptr<Expr> expr) : expression(std::move(expr)) {}
 
-    void accept(AstVisitor &visitor) override
+    std::string accept(AstVisitor &visitor) override
     {
         return visitor.visitGrouping(*this);
     }
@@ -51,7 +51,7 @@ struct Literal : public Expr
     Value value;
     Literal(Value val) : value(val) {}
 
-    void accept(AstVisitor &visitor) override
+    std::string accept(AstVisitor &visitor) override
     {
         return visitor.visitLiteral(*this);
     }
@@ -69,7 +69,7 @@ struct Unary : public Expr
 
     Unary(Token o, std::unique_ptr<Expr> r) : op(o), right(std::move(r)) {}
 
-    void accept(AstVisitor &visitor) override
+    std::string accept(AstVisitor &visitor) override
     {
         return visitor.visitUnary(*this);
     }
