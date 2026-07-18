@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <variant>
 
 struct Binary;
 struct Grouping;
