@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "TypesAndStructures/Token.hpp"
+#include "Helper/Token.hpp"
 #include "Visitors/AstVisitor.hpp"
 #include "Visitors/EvaluatorVisitor.hpp"
 

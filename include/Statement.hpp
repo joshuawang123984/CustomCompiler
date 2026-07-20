@@ -1,5 +1,6 @@
+#pragma once
 #include "Visitors/StatementVisitor.hpp"
-#include "TypesAndStructures/Types.hpp"
+#include "Helper/Types.hpp"
 
 class Statement
 {

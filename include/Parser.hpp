@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "TypesAndStructures/Token.hpp"
-#include "TypesAndStructures/TokenVector.hpp"
+#include "Helper/Token.hpp"
+#include "Helper/TokenVector.hpp"
 #include "Expr.hpp"
 
 class Parser

@@ -1,7 +1,9 @@
 #include "Visitors/EvaluatorVisitor.hpp"
+#include "Visitors/StatementVisitor.hpp"
+#include "Environment.hpp"
 #include "Expr.hpp"
 
-class Evaluator : public EvaluatorVisitor
+class Evaluator : public EvaluatorVisitor, public StatementVisitor
 {
 public:
     virtual ~Evaluator() = default;
@@ -12,6 +14,11 @@ public:
     Value visitLiteralExpr(Literal &expr) override;
     Value visitUnaryExpr(Unary &expr) override;
 
+    void visitVarStatement(VarStatement &stmt) override;
+    void visitPrintStatement(PrintStatement &stmt) override;
+
 private:
+    std::unique_ptr<Environment> environment = std::make_unique<Environment>();
+
     void checkNumberOperands(const Value &left, const Value &right);
 };

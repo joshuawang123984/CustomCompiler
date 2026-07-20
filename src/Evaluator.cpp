@@ -1,4 +1,5 @@
 #include "../include/Evaluator.hpp"
+#include "Helper/Functions.hpp"
 
 void Evaluator::checkNumberOperands(const Value &left, const Value &right)
 {
@@ -87,4 +88,20 @@ Value Evaluator::visitUnaryExpr(Unary &expr)
     }
 
     return nullptr;
+}
+
+void Evaluator::visitVarStatement(VarStatement &stmt)
+{
+    Value val = nullptr;
+    if (stmt.initializer)
+    {
+        val = evaluate(*stmt.initializer);
+    }
+
+    environment->define(stmt.name, val);
+}
+void Evaluator::visitPrintStatement(PrintStatement &stmt)
+{
+    Value val = evaluate(*stmt.expression);
+    std::cout << stringify(val) << std::endl;
 }

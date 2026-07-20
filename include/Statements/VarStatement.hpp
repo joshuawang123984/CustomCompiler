@@ -8,7 +8,7 @@ public:
 
     VarStatement(std::string name, std::unique_ptr<Expr> initializer) : name(std::move(name)), initializer(std::move(initializer)) {}
 
-    void accept(VarVisitor &visitor) override
+    void accept(StatementVisitor &visitor) override
     {
         visitor.visitVarStatement(*this);
     }
