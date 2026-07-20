@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include "../include/TokenVector.hpp"
+#include "../include/TypesAndStructures/TokenVector.hpp"
 
 TokenVector::TokenVector(const std::string &source, int *current, int *start) : source(source), current(current), start(start) {}
 TokenVector::TokenVector(TokenVector other, const std::string &source, int *current, int *start) : tokens(other.tokens), source(source), current(current), start(start) {}

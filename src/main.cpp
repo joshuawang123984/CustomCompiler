@@ -2,7 +2,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "../include/Token.hpp"
 #include "../include/Scanner.hpp"
 #include "../include/Parser.hpp"
 #include "../include/AstPrinter.hpp"

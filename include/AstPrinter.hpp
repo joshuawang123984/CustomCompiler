@@ -1,4 +1,4 @@
-#include "AstVisitor.hpp"
+#include "Visitors/AstVisitor.hpp"
 #include "Expr.hpp"
 
 class AstPrinter : public AstVisitor

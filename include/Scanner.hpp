@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "Token.hpp"
-#include "TokenVector.hpp"
+#include "TypesAndStructures/Token.hpp"
+#include "TypesAndStructures/TokenVector.hpp"
 
 class Scanner
 {

@@ -1,6 +1,5 @@
 #include <iostream>
 #include "../include/Parser.hpp"
-#include "../include/Token.hpp"
 
 Parser::Parser(TokenVector &tokens) : tokenVector(TokenVector(tokens, tokens.getSource(), &current, nullptr)) {}
 const TokenVector &Parser::getTokens() const { return tokenVector; }

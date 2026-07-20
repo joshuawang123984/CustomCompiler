@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
-#include "Token.hpp"
-#include "AstVisitor.hpp"
-#include "EvaluatorVisitor.hpp"
+#include "TypesAndStructures/Token.hpp"
+#include "Visitors/AstVisitor.hpp"
+#include "Visitors/EvaluatorVisitor.hpp"
 
 struct Expr
 {
@@ -69,7 +69,7 @@ struct Unary : public Expr
 
     Unary(Token o, std::unique_ptr<Expr> r) : op(o), right(std::move(r)) {}
 
-    std::string  accept(AstVisitor &visitor) override
+    std::string accept(AstVisitor &visitor) override
     {
         return visitor.visitUnary(*this);
     }

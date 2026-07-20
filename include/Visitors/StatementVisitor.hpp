@@ -1,5 +1,5 @@
-#include "Statements/VarStatement.hpp"
-#include "Statements/PrintStatement.hpp"
+#include "../Statements/VarStatement.hpp"
+#include "../Statements/PrintStatement.hpp"
 
 class StatementVisitor
 {

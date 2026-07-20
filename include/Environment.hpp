@@ -1,6 +1,6 @@
 #include <iostream>
 #include <unordered_map>
-#include "Types.hpp"
+#include "TypesAndStructures/Types.hpp"
 
 class Environment
 {

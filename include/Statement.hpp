@@ -1,5 +1,5 @@
-#include "StatementVisitor.hpp"
-#include "Types.hpp"
+#include "Visitors/StatementVisitor.hpp"
+#include "TypesAndStructures/Types.hpp"
 
 class Statement
 {

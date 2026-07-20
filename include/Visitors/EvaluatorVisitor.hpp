@@ -1,5 +1,5 @@
 #pragma once
-#include "Token.hpp"
+#include "../TypesAndStructures/Token.hpp"
 
 struct Binary;
 struct Grouping;
