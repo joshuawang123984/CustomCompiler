@@ -1,5 +1,6 @@
-#include "../include/Evaluator.hpp"
+#include "../include/Statements/Statements.hpp"
 #include "Helper/Functions.hpp"
+#include "../include/Evaluator.hpp"
 
 void Evaluator::checkNumberOperands(const Value &left, const Value &right)
 {

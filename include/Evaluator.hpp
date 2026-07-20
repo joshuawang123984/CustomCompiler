@@ -1,5 +1,7 @@
-#include "Visitors/EvaluatorVisitor.hpp"
+#pragma once
 #include "Visitors/StatementVisitor.hpp"
+#include "Statement.hpp"
+#include "Visitors/EvaluatorVisitor.hpp"
 #include "Environment.hpp"
 #include "Expr.hpp"
 

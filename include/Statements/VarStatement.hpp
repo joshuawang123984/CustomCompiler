@@ -1,4 +1,8 @@
+#pragma once
+
+#include "../Visitors/StatementVisitor.hpp"
 #include "../Statement.hpp"
+#include "../Expr.hpp"
 
 class VarStatement : public Statement
 {

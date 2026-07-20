@@ -1,11 +1,11 @@
 #pragma once
-#include "Visitors/StatementVisitor.hpp"
-#include "Helper/Types.hpp"
+
+class StatementVisitor;
 
 class Statement
 {
 public:
     virtual ~Statement() = default;
 
-    virtual Value accept(StatementVisitor &visitor) = 0;
+    virtual void accept(StatementVisitor &visitor) = 0;
 };
