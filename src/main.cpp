@@ -7,6 +7,8 @@
 #include "../include/AstPrinter.hpp"
 #include "../include/Evaluator.hpp"
 
+void testExpr();
+void testStatement();
 void printTokens(const TokenVector &tokens);
 void printValue(Value val);
 void runFile(const std::string &path);
@@ -31,16 +33,39 @@ int main(int argc, char *argv[])
 
     else
     {
-        // scanner can do expressions like var x = 10 but parser cant yet
-        std::string sourceCode = "30 + 10 * 5 * 9 + 301 - 31983 / 3 * (-1 + 4 / 2)";
-        TokenVector tokens = testScanner(sourceCode);
-        std::unique_ptr<Expr> ast = testParse(tokens);
-        Value result = testEvaluator(std::move(ast));
+        testStatement();
     }
 
     return 0;
 }
 
+void testExpr()
+{
+    // scanner can do expressions like var x = 10 but parser cant yet
+    std::string sourceCode = "30 + 10 * 5 * 9 + 301 - 31983 / 3 * (-1 + 4 / 2)";
+    TokenVector tokens = testScanner(sourceCode);
+    std::unique_ptr<Expr> ast = testParse(tokens);
+    Value result = testEvaluator(std::move(ast));
+}
+void testStatement()
+{
+    std::string source =
+        "var x = 10 + 5;\n"
+        "var y = x * 2;\n"
+        "print y;\n"
+        "x + 5;\n";
+
+    TokenVector tokens = testScanner(source);
+
+    Parser parser(tokens);
+    std::vector<std::unique_ptr<Statement>> statements = parser.stmt_parse();
+
+    Evaluator evaluator;
+    for (const auto &stmt : statements)
+    {
+        stmt->accept(evaluator);
+    }
+}
 void printTokens(const TokenVector &tokens)
 {
 
@@ -103,7 +128,7 @@ TokenVector testScanner(const std::string &sourceCode)
 std::unique_ptr<Expr> testParse(TokenVector tokens)
 {
     Parser parser(tokens);
-    std::unique_ptr<Expr> ast = parser.parse();
+    std::unique_ptr<Expr> ast = parser.expr_parse();
 
     AstPrinter printer;
     std::string ast_result = printer.print(*ast);

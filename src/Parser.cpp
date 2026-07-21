@@ -4,7 +4,46 @@
 Parser::Parser(TokenVector &tokens) : tokenVector(TokenVector(tokens, tokens.getSource(), &current, nullptr)) {}
 const TokenVector &Parser::getTokens() const { return tokenVector; }
 
-std::unique_ptr<Expr> Parser::parse()
+std::vector<std::unique_ptr<Statement>> Parser::stmt_parse()
+{
+    std::vector<std::unique_ptr<Statement>> statements;
+
+    while (!tokenVector.isAtEnd())
+    {
+        statements.push_back(statement());
+    }
+
+    return statements;
+}
+std::unique_ptr<Statement> Parser::statement()
+{
+    if (tokenVector.token_match(TokenType::PRINT))
+        return printStatement();
+
+    if (tokenVector.token_match(TokenType::VAR))
+        return varDeclaration();
+
+    auto expr = expression();
+    tokenVector.consume(TokenType::SEMICOLON, "expect ';' after declaration");
+    return std::make_unique<ExpressionStatement>(std::move(expr));
+}
+std::unique_ptr<Statement> Parser::printStatement()
+{
+    auto value = expression();
+    tokenVector.consume(TokenType::SEMICOLON, "expect ';' after declaration");
+    return std::make_unique<PrintStatement>(std::move(value));
+}
+std::unique_ptr<Statement> Parser::varDeclaration()
+{
+    Token nameToken = tokenVector.consume(TokenType::IDENTIFIER, "variable name");
+    std::unique_ptr<Expr> initializer = nullptr;
+    if (tokenVector.token_match(TokenType::EQUAL))
+        initializer = expression();
+
+    tokenVector.consume(TokenType::SEMICOLON, "expect ';' after declaration");
+    return std::make_unique<VarStatement>(nameToken.lexeme, std::move(initializer));
+}
+std::unique_ptr<Expr> Parser::expr_parse()
 {
     try
     {
@@ -101,6 +140,11 @@ std::unique_ptr<Expr> Parser::primary()
         auto expr = expression();
         tokenVector.consume(TokenType::RIGHT_PAREN, "Expect ')' after expression");
         return std::make_unique<Grouping>(std::move(expr));
+    }
+
+    if (tokenVector.token_match(TokenType::IDENTIFIER))
+    {
+        throw std::runtime_error("Not implemented yet.");
     }
 
     throw std::runtime_error("Expect expression.");

@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
+#include "Statement.hpp"
 #include "Helper/Token.hpp"
 #include "Helper/TokenVector.hpp"
 #include "Expr.hpp"
+#include "../include/Statements/Statements.hpp"
 
 class Parser
 {
@@ -10,7 +12,12 @@ public:
     explicit Parser(TokenVector &tokens);
     const TokenVector &getTokens() const;
 
-    std::unique_ptr<Expr> parse();
+    std::vector<std::unique_ptr<Statement>> stmt_parse();
+    std::unique_ptr<Statement> statement();
+
+    std::unique_ptr<Statement> printStatement();
+    std::unique_ptr<Statement> varDeclaration();
+    std::unique_ptr<Expr> expr_parse();
 
 private:
     TokenVector tokenVector;

@@ -106,3 +106,8 @@ void Evaluator::visitPrintStatement(PrintStatement &stmt)
     Value val = evaluate(*stmt.expression);
     std::cout << stringify(val) << std::endl;
 }
+
+void Evaluator::visitExpressionStatement(ExpressionStatement &stmt)
+{
+    evaluate(*stmt.expression);
+}
