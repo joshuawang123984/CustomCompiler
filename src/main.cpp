@@ -33,7 +33,8 @@ int main(int argc, char *argv[])
 
     else
     {
-        testStatement();
+        testExpr();
+        // testStatement();
     }
 
     return 0;

@@ -30,7 +30,7 @@ enum class TokenType
     CLASS,
     ELSE,
     FALSE,
-    FUN,
+    FUNC,
     FOR,
     IF,
     NIL,
