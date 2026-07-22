@@ -79,3 +79,21 @@ struct Unary : public Expr
         return visitor.visitUnaryExpr(*this);
     }
 };
+
+struct Variable : public Expr
+{
+public:
+    const std::string name;
+
+    Variable(std::string name) : name(std::move(name)) {}
+
+    std::string accept(AstVisitor &visitor) override
+    {
+        return visitor.visitVariable(*this);
+    }
+
+    Value evaluate(EvaluatorVisitor &visitor) override
+    {
+        return visitor.visitVariableExpr(*this);
+    }
+};

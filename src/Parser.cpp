@@ -8,7 +8,7 @@ std::vector<std::unique_ptr<Statement>> Parser::stmt_parse()
 {
     std::vector<std::unique_ptr<Statement>> statements;
 
-    while (!tokenVector.isAtEnd())
+    while (!tokenVector.check(TokenType::EOF_TOKEN))
     {
         statements.push_back(statement());
     }
@@ -135,6 +135,11 @@ std::unique_ptr<Expr> Parser::primary()
     if (tokenVector.token_match(TokenType::NUMBER) || tokenVector.token_match(TokenType::STRING))
         return std::make_unique<Literal>(tokenVector.previous().literal);
 
+    if (tokenVector.token_match(TokenType::IDENTIFIER))
+    {
+        return std::make_unique<Variable>(tokenVector.previous().lexeme);
+    }
+
     if (tokenVector.token_match(TokenType::LEFT_PAREN))
     {
         auto expr = expression();
@@ -142,10 +147,5 @@ std::unique_ptr<Expr> Parser::primary()
         return std::make_unique<Grouping>(std::move(expr));
     }
 
-    if (tokenVector.token_match(TokenType::IDENTIFIER))
-    {
-        throw std::runtime_error("Not implemented yet.");
-    }
-
-    throw std::runtime_error("Expect expression.");
+    throw std::runtime_error("Expect expression." + tokenVector.token_peek().lexeme);
 }

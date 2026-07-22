@@ -25,6 +25,12 @@ public:
     {
         return parenthesize(expr.op.lexeme, {expr.right.get()});
     }
+    std::string visitVariable(Variable &expr) override
+    {
+        std::string result = "Variable Name: " + expr.name;
+
+        return result;
+    }
 
 private:
     std::string parenthesize(const std::string &name, std::vector<Expr *> exprs)

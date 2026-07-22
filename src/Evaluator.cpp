@@ -91,6 +91,11 @@ Value Evaluator::visitUnaryExpr(Unary &expr)
     return nullptr;
 }
 
+Value Evaluator::visitVariableExpr(Variable &expr)
+{
+    return environment->get(expr.name);
+}
+
 void Evaluator::visitVarStatement(VarStatement &stmt)
 {
     Value val = nullptr;
