@@ -116,3 +116,7 @@ void Evaluator::visitExpressionStatement(ExpressionStatement &stmt)
 {
     evaluate(*stmt.expression);
 }
+
+void Evaluator::visitIfStatement(IfStatement &stmt) {}
+void Evaluator::visitWhileStatement(WhileStatement &stmt) {}
+void Evaluator::visitForStatement(ForStatement &stmt) {}
