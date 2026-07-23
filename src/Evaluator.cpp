@@ -117,6 +117,56 @@ void Evaluator::visitExpressionStatement(ExpressionStatement &stmt)
     evaluate(*stmt.expression);
 }
 
-void Evaluator::visitIfStatement(IfStatement &stmt) {}
-void Evaluator::visitWhileStatement(WhileStatement &stmt) {}
-void Evaluator::visitForStatement(ForStatement &stmt) {}
+void Evaluator::visitIfStatement(IfStatement &stmt)
+{
+    Value conditionResult = evaluate(*stmt.condition);
+
+    if (isTruthy(conditionResult))
+    {
+        stmt.thenBranch->accept(*this);
+    }
+    else if (stmt.elseBranch != nullptr)
+    {
+        stmt.elseBranch->accept(*this);
+    }
+}
+void Evaluator::visitWhileStatement(WhileStatement &stmt)
+{
+
+    while (isTruthy(evaluate(*stmt.condition)))
+    {
+        stmt.body->accept(*this);
+    }
+}
+void Evaluator::visitForStatement(ForStatement &stmt)
+{
+    if (stmt.initializer != nullptr)
+    {
+        stmt.initializer->accept(*this);
+    }
+
+    while (stmt.condition == nullptr || isTruthy(evaluate(*stmt.condition)))
+    {
+        stmt.body->accept(*this);
+
+        if (stmt.increment != nullptr)
+        {
+            evaluate(*stmt.increment);
+        }
+    }
+}
+
+void Evaluator::visitBlockStatement(BlockStatement &stmt)
+{
+    auto blockEnv = std::make_unique<Environment>(environment.get());
+
+    auto previousEnv = std::move(environment);
+    environment = std::move(blockEnv);
+
+    for (const auto &statement : stmt.statements)
+    {
+        statement->accept(*this);
+    }
+
+    environment = std::move(previousEnv);
+}

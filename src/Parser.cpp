@@ -17,20 +17,33 @@ std::vector<std::unique_ptr<Statement>> Parser::stmt_parse()
 }
 std::unique_ptr<Statement> Parser::statement()
 {
+    std::cout << "Parsing statement at token type: " << static_cast<int>(tokenVector.token_peek().type) << std::endl;
     if (tokenVector.token_match(TokenType::PRINT))
         return printStatement();
 
     if (tokenVector.token_match(TokenType::VAR))
         return varDeclaration();
 
+    if (tokenVector.token_match(TokenType::IF))
+        return ifStatement();
+
+    if (tokenVector.token_match(TokenType::WHILE))
+        return whileStatement();
+
+    if (tokenVector.token_match(TokenType::FOR))
+        return forStatement();
+
+    if (tokenVector.token_match(TokenType::LEFT_BRACE))
+        return blockStatement();
+
     auto expr = expression();
-    tokenVector.consume(TokenType::SEMICOLON, "expect ';' after declaration");
+    tokenVector.consume(TokenType::SEMICOLON, "(statement) expect ';' after declaration");
     return std::make_unique<ExpressionStatement>(std::move(expr));
 }
 std::unique_ptr<Statement> Parser::printStatement()
 {
     auto value = expression();
-    tokenVector.consume(TokenType::SEMICOLON, "expect ';' after declaration");
+    tokenVector.consume(TokenType::SEMICOLON, "(printStatement) expect ';' after declaration");
     return std::make_unique<PrintStatement>(std::move(value));
 }
 std::unique_ptr<Statement> Parser::varDeclaration()
@@ -40,8 +53,78 @@ std::unique_ptr<Statement> Parser::varDeclaration()
     if (tokenVector.token_match(TokenType::EQUAL))
         initializer = expression();
 
-    tokenVector.consume(TokenType::SEMICOLON, "expect ';' after declaration");
+    tokenVector.consume(TokenType::SEMICOLON, "(varDeclaration) expect ';' after declaration");
     return std::make_unique<VarStatement>(nameToken.lexeme, std::move(initializer));
+}
+std::unique_ptr<Statement> Parser::ifStatement()
+{
+    tokenVector.consume(TokenType::LEFT_PAREN, "Expect '(' after 'if'.");
+    auto condition = expression();
+    tokenVector.consume(TokenType::RIGHT_PAREN, "Expect ')' after if condition.");
+
+    auto thenBranch = statement();
+    std::unique_ptr<Statement> elseBranch = nullptr;
+
+    if (tokenVector.token_match(TokenType::ELSE))
+    {
+        elseBranch = statement();
+    }
+
+    return std::make_unique<IfStatement>(std::move(condition), std::move(thenBranch), std::move(elseBranch));
+}
+std::unique_ptr<Statement> Parser::whileStatement()
+{
+    tokenVector.consume(TokenType::LEFT_PAREN, "Expect '(' after 'while'.");
+    auto condition = expression();
+    tokenVector.consume(TokenType::RIGHT_PAREN, "Expect ')' after while condition.");
+
+    auto body = statement();
+
+    return std::make_unique<WhileStatement>(std::move(condition), std::move(body));
+}
+std::unique_ptr<Statement> Parser::forStatement()
+{
+    tokenVector.consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
+    std::unique_ptr<Statement> initializer = nullptr;
+    if (tokenVector.token_match(TokenType::SEMICOLON))
+    {
+        initializer = nullptr;
+    }
+    else if (tokenVector.token_match(TokenType::VAR))
+    {
+        // Variable declaration initializer: for (var i = 0; ...)
+        // varDeclaration handles semicolon token
+        initializer = varDeclaration();
+    }
+    else
+    {
+        // Expression statement initializer: for (i = 0; ...)
+        auto expr = expression();
+        tokenVector.consume(TokenType::SEMICOLON, "Expect ';' after expression initializer.");
+        initializer = std::make_unique<ExpressionStatement>(std::move(expr));
+    }
+    std::unique_ptr<Expr> condition = expression();
+
+    tokenVector.consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
+
+    std::unique_ptr<Expr> increment = expression();
+
+    tokenVector.consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    auto body = statement();
+
+    return std::make_unique<ForStatement>(std::move(initializer), std::move(condition), std::move(increment), std::move(body));
+}
+std::unique_ptr<Statement> Parser::blockStatement()
+{
+    std::vector<std::unique_ptr<Statement>> statements;
+
+    while (!tokenVector.check(TokenType::RIGHT_BRACE) && !tokenVector.isAtEnd() && !tokenVector.token_match(TokenType::EOF_TOKEN))
+    {
+        statements.push_back(statement());
+    }
+    tokenVector.consume(TokenType::RIGHT_BRACE, "expect '}' after block");
+    return std::make_unique<BlockStatement>(std::move(statements));
 }
 std::unique_ptr<Expr> Parser::expr_parse()
 {
@@ -147,5 +230,5 @@ std::unique_ptr<Expr> Parser::primary()
         return std::make_unique<Grouping>(std::move(expr));
     }
 
-    throw std::runtime_error("Expect expression." + tokenVector.token_peek().lexeme);
+    throw std::runtime_error("Expect expression. Failed Token: " + tokenVector.token_peek().lexeme);
 }

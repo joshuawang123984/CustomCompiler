@@ -6,3 +6,4 @@
 #include "../ControlFlow/IfStatement.hpp"
 #include "../ControlFlow/WhileStatement.hpp"
 #include "../ControlFlow/ForStatement.hpp"
+#include "../ControlFlow/BlockStatement.hpp"

@@ -16,3 +16,14 @@ std::string stringify(Value value)
 
     return "unknown";
 }
+
+bool isTruthy(Value value)
+{
+    if (std::holds_alternative<bool>(value))
+        return std::get<bool>(value);
+
+    if (std::holds_alternative<std::nullptr_t>(value))
+        return false;
+
+    return true;
+}

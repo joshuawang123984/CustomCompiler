@@ -23,6 +23,7 @@ public:
     void visitIfStatement(IfStatement &stmt) override;
     void visitWhileStatement(WhileStatement &stmt) override;
     void visitForStatement(ForStatement &stmt) override;
+    void visitBlockStatement(BlockStatement &stmt) override;
 
 private:
     std::unique_ptr<Environment> environment = std::make_unique<Environment>();

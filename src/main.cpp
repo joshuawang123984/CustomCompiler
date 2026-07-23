@@ -9,6 +9,7 @@
 
 void testExpr();
 void testStatement();
+void testControlFlow();
 void printTokens(const TokenVector &tokens);
 void printValue(Value val);
 void runFile(const std::string &path);
@@ -33,8 +34,9 @@ int main(int argc, char *argv[])
 
     else
     {
-        testExpr();
+        // testExpr();
         // testStatement();
+        testControlFlow();
     }
 
     return 0;
@@ -55,6 +57,46 @@ void testStatement()
         "var y = x * 2;\n"
         "print y;\n"
         "x + 5;\n";
+
+    TokenVector tokens = testScanner(source);
+
+    Parser parser(tokens);
+    std::vector<std::unique_ptr<Statement>> statements = parser.stmt_parse();
+
+    Evaluator evaluator;
+    for (const auto &stmt : statements)
+    {
+        stmt->accept(evaluator);
+    }
+}
+
+void testControlFlow()
+{
+    std::string source =
+        "var x = 10;\n"
+        "var y = 0;\n"
+        "\n"
+        "// Test if/else\n"
+        "if (x > 5) {\n"
+        "    y = 100;\n"
+        "} else {\n"
+        "    y = 42;\n"
+        "}\n"
+        "\n"
+        "// Test while loop\n"
+        "var count = 0;\n"
+        "while (count < 3) {\n"
+        "    count = count + 1;\n"
+        "}\n"
+        "\n"
+        "// Test for loop\n"
+        "for (var i = 0; i < 3; i = i + 1) {\n"
+        "    y = y + i;\n"
+        "}\n"
+        "\n"
+        "print x;\n"
+        "print y;\n"
+        "print count;\n";
 
     TokenVector tokens = testScanner(source);
 

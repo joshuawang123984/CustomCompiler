@@ -8,6 +8,11 @@ private:
     std::unordered_map<std::string, Value> values;
 
 public:
+    Environment *enclosing;
+
+    Environment() : enclosing(nullptr) {}
+    Environment(Environment *enclosing) : enclosing(enclosing) {}
+
     void define(const std::string &name, Value value)
     {
         values[name] = value;

@@ -17,6 +17,11 @@ public:
 
     std::unique_ptr<Statement> printStatement();
     std::unique_ptr<Statement> varDeclaration();
+    std::unique_ptr<Statement> ifStatement();
+    std::unique_ptr<Statement> whileStatement();
+    std::unique_ptr<Statement> forStatement();
+    std::unique_ptr<Statement> blockStatement();
+
     std::unique_ptr<Expr> expr_parse();
 
 private:
