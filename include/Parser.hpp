@@ -1,10 +1,9 @@
 #pragma once
 #include <vector>
-#include "Statement.hpp"
 #include "Helper/Token.hpp"
 #include "Helper/TokenVector.hpp"
-#include "Expr.hpp"
-#include "../include/Statements/Statements.hpp"
+#include "Expressions/Expr.hpp"
+#include "Statements/StatementImports.hpp"
 
 class Parser
 {

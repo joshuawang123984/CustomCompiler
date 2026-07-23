@@ -1,6 +1,6 @@
-#include "Visitors/AstVisitor.hpp"
+#include "AstVisitor.hpp"
 #include "Helper/Functions.hpp"
-#include "Expr.hpp"
+#include "../Expr.hpp"
 
 class AstPrinter : public AstVisitor
 {

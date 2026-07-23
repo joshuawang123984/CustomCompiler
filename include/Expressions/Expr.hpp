@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include "Helper/Token.hpp"
-#include "Visitors/AstVisitor.hpp"
-#include "Visitors/EvaluatorVisitor.hpp"
+#include "Printing/AstVisitor.hpp"
+#include "EvaluatorVisitor.hpp"
 
 struct Expr
 {

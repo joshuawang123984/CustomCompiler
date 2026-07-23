@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Visitors/StatementVisitor.hpp"
+#include "../StatementVisitor.hpp"
 #include "../Statement.hpp"
-#include "../Expr.hpp"
+#include "../../Expressions/Expr.hpp"
 
 class PrintStatement : public Statement
 {

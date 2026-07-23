@@ -4,7 +4,7 @@
 #include <vector>
 #include "../include/Scanner.hpp"
 #include "../include/Parser.hpp"
-#include "../include/AstPrinter.hpp"
+#include "../include/Expressions/Printing/AstPrinter.hpp"
 #include "../include/Evaluator.hpp"
 
 void testExpr();

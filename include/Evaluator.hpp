@@ -1,9 +1,9 @@
 #pragma once
-#include "Visitors/StatementVisitor.hpp"
-#include "Statement.hpp"
-#include "Visitors/EvaluatorVisitor.hpp"
+#include "Statements/StatementVisitor.hpp"
+#include "Statements/Statement.hpp"
+#include "Expressions/EvaluatorVisitor.hpp"
 #include "Environment.hpp"
-#include "Expr.hpp"
+#include "Expressions/Expr.hpp"
 
 class Evaluator : public EvaluatorVisitor, public StatementVisitor
 {
