@@ -27,6 +27,8 @@ private:
     TokenVector tokenVector;
     int current = 0;
 
+    std::unique_ptr<Statement> expressionStatement();
+
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();

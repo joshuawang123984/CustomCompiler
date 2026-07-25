@@ -15,6 +15,15 @@ std::vector<std::unique_ptr<Statement>> Parser::stmt_parse()
 
     return statements;
 }
+
+std::unique_ptr<Statement> Parser::expressionStatement()
+{
+    auto expr = expression();
+    std::cout << tokenVector.token_peek().lexeme << std::endl;
+    tokenVector.consume(TokenType::SEMICOLON, "(expressionStatement) expect ';' after declaration");
+    return std::make_unique<ExpressionStatement>(std::move(expr));
+}
+
 std::unique_ptr<Statement> Parser::statement()
 {
     std::cout << "Parsing statement at token type: " << static_cast<int>(tokenVector.token_peek().type) << std::endl;
@@ -36,9 +45,7 @@ std::unique_ptr<Statement> Parser::statement()
     if (tokenVector.token_match(TokenType::LEFT_BRACE))
         return blockStatement();
 
-    auto expr = expression();
-    tokenVector.consume(TokenType::SEMICOLON, "(statement) expect ';' after declaration");
-    return std::make_unique<ExpressionStatement>(std::move(expr));
+    return expressionStatement();
 }
 std::unique_ptr<Statement> Parser::printStatement()
 {
@@ -100,16 +107,16 @@ std::unique_ptr<Statement> Parser::forStatement()
     {
         // Expression statement initializer: for (i = 0; ...)
         auto expr = expression();
-        tokenVector.consume(TokenType::SEMICOLON, "Expect ';' after expression initializer.");
+        tokenVector.consume(TokenType::SEMICOLON, "(forStatement) Expect ';' after expression initializer.");
         initializer = std::make_unique<ExpressionStatement>(std::move(expr));
     }
     std::unique_ptr<Expr> condition = expression();
 
-    tokenVector.consume(TokenType::SEMICOLON, "Expect ';' after loop condition.");
+    tokenVector.consume(TokenType::SEMICOLON, "(forStatement 2) Expect ';' after loop condition.");
 
     std::unique_ptr<Expr> increment = expression();
 
-    tokenVector.consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
+    tokenVector.consume(TokenType::RIGHT_PAREN, "(forStatement 3) Expect ')' after for clauses.");
 
     auto body = statement();
 
@@ -118,6 +125,7 @@ std::unique_ptr<Statement> Parser::forStatement()
 std::unique_ptr<Statement> Parser::blockStatement()
 {
     std::vector<std::unique_ptr<Statement>> statements;
+    // add the current environment statements to this.
 
     while (!tokenVector.check(TokenType::RIGHT_BRACE) && !tokenVector.isAtEnd() && !tokenVector.token_match(TokenType::EOF_TOKEN))
     {

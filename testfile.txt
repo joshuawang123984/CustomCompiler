@@ -1,0 +1,22 @@
+var x = 10;
+var y = 0;
+
+{
+var z = 10;
+print z;
+}
+
+var a = "hi";
+print a;
+
+if (x > 5) 
+{
+    y = 100;
+}
+
+else 
+{
+    y = 42;
+}
+
+ 

@@ -41,6 +41,8 @@ void Scanner::string()
     {
         if (tokenVector.char_peek() != '\n')
             line++;
+
+        tokenVector.char_advance();
     }
 
     if (tokenVector.isAtEnd())

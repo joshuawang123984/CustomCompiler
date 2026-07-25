@@ -9,12 +9,10 @@
 
 void testExpr();
 void testStatement();
-void testControlFlow();
+void testControlFlow(std::string source);
 void printTokens(const TokenVector &tokens);
 void printValue(Value val);
 void runFile(const std::string &path);
-void runPrompt();
-void run(const std::string &source);
 TokenVector testScanner(const std::string &sourceCode);
 std::unique_ptr<Expr> testParse(TokenVector tokens);
 Value testEvaluator(std::unique_ptr<Expr> ast);
@@ -36,7 +34,7 @@ int main(int argc, char *argv[])
     {
         // testExpr();
         // testStatement();
-        testControlFlow();
+        // testControlFlow();
     }
 
     return 0;
@@ -70,44 +68,34 @@ void testStatement()
     }
 }
 
-void testControlFlow()
+void testControlFlow(std::string source)
 {
-    std::string source =
-        "var x = 10;\n"
-        "var y = 0;\n"
-        "\n"
-        "// Test if/else\n"
-        "if (x > 5) {\n"
-        "    y = 100;\n"
-        "} else {\n"
-        "    y = 42;\n"
-        "}\n"
-        "\n"
-        "// Test while loop\n"
-        "var count = 0;\n"
-        "while (count < 3) {\n"
-        "    count = count + 1;\n"
-        "}\n"
-        "\n"
-        "// Test for loop\n"
-        "for (var i = 0; i < 3; i = i + 1) {\n"
-        "    y = y + i;\n"
-        "}\n"
-        "\n"
-        "print x;\n"
-        "print y;\n"
-        "print count;\n";
-
-    TokenVector tokens = testScanner(source);
-
-    Parser parser(tokens);
-    std::vector<std::unique_ptr<Statement>> statements = parser.stmt_parse();
-
-    Evaluator evaluator;
-    for (const auto &stmt : statements)
+    try
     {
-        stmt->accept(evaluator);
+        std::cout << source << std::endl;
+        Scanner scanner(source);
+        TokenVector tokens = scanner.scanTokens();
+
+        Parser parser(tokens);
+        std::vector<std::unique_ptr<Statement>> statements = parser.stmt_parse();
+
+        Evaluator evaluator;
+        for (const auto &stmt : statements)
+        {
+            stmt->accept(evaluator);
+        }
     }
+    catch (const std::exception &e)
+    {
+        std::cerr << "RUNTIME/PARSER ERROR: " << e.what() << std::endl;
+    }
+
+    // print environment:
+    // std::cout << "Environment Variables:" << std::endl;
+    // for (const auto &[key, value] : evaluator.getEnvironment()->getValues())
+    // {
+    //     std::cout << key << " = " << stringify(value) << std::endl;
+    // }
 }
 void printTokens(const TokenVector &tokens)
 {
@@ -136,24 +124,7 @@ void runFile(const std::string &path)
     }
 
     std::string source((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    run(source);
-}
-
-void runPrompt()
-{
-    std::string line;
-    for (;;)
-    {
-        std::cout << "> ";
-        if (!std::getline(std::cin, line))
-            break;
-        run(line);
-    }
-}
-
-void run(const std::string &source)
-{
-    return;
+    testControlFlow(source);
 }
 
 TokenVector testScanner(const std::string &sourceCode)

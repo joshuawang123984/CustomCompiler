@@ -9,6 +9,11 @@ void Evaluator::checkNumberOperands(const Value &left, const Value &right)
     throw std::runtime_error("Operands must be numbers.");
 }
 
+std::unique_ptr<Environment> Evaluator::getEnvironment()
+{
+    return std::move(environment);
+}
+
 Value Evaluator::evaluate(Expr &expr)
 {
     return expr.evaluate(*this);

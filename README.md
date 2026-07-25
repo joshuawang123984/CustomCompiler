@@ -6,8 +6,8 @@ A custom-built compiler project focused on implementing a recursive descent pars
 This project follows the standard compiler design pipeline:
 
 *   **Lexer (Scanner):** Converts raw source code into a stream of categorized tokens.
-*   **Parser:** Constructs an Abstract Syntax Tree (AST) while enforcing operator precedence (PEMDAS).
-*   **Evaluator:** Traverses the AST to execute the operations defined in the source.
+*   **Parser:** Constructs an Abstract Syntax Tree (AST) while enforcing precedence.
+*   **Evaluator:** Traverses the AST to execute code defined in the source.
 
 ## Technical Stack
 *   **Language:** C++17

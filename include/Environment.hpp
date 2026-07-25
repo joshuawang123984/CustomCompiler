@@ -13,9 +13,17 @@ public:
     Environment() : enclosing(nullptr) {}
     Environment(Environment *enclosing) : enclosing(enclosing) {}
 
+    std::unordered_map<std::string, Value> getValues()
+    {
+        return values;
+    }
+
     void define(const std::string &name, Value value)
     {
-        values[name] = value;
+        if (values.find(name) == values.end())
+            values[name] = value;
+        else
+            throw std::runtime_error("variable already exists: '" + name + "'.");
     }
 
     Value get(const std::string name)

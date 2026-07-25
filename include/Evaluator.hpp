@@ -9,6 +9,8 @@ class Evaluator : public EvaluatorVisitor, public StatementVisitor
 {
 public:
     virtual ~Evaluator() = default;
+    std::unique_ptr<Environment> getEnvironment();
+
     virtual Value evaluate(Expr &expr);
 
     Value visitBinaryExpr(Binary &expr) override;
