@@ -30,7 +30,6 @@ int main(int argc, char *argv[])
     else
     {
         std::cout << "Usage: lox [script]" << std::endl;
-        std::exit(64);
     }
 
     return 0;
