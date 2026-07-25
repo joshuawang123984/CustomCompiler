@@ -1,5 +1,7 @@
 #include "../Statement.hpp"
 #include "../../Expressions/Expr.hpp"
+#include <vector>
+#include <memory>
 
 class BlockStatement : public Statement
 {
