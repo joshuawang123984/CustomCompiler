@@ -9,14 +9,7 @@ print z;
 var a = "hi";
 print a;
 
-if (x > 5) 
 {
-    y = 100;
+    print a;
 }
-
-else 
-{
-    y = 42;
-}
-
  

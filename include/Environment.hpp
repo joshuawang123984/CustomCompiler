@@ -22,6 +22,12 @@ public:
     {
         if (values.find(name) == values.end())
             values[name] = value;
+
+        else if (enclosing != nullptr)
+        {
+            return enclosing->define(name, value);
+        }
+
         else
             throw std::runtime_error("variable already exists: '" + name + "'.");
     }
@@ -31,6 +37,11 @@ public:
         if (values.find(name) != values.end())
         {
             return values[name];
+        }
+
+        if (enclosing != nullptr)
+        {
+            return enclosing->get(name);
         }
 
         throw std::runtime_error("Undefined variable '" + name + "'.");

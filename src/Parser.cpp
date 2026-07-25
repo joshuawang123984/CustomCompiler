@@ -19,14 +19,12 @@ std::vector<std::unique_ptr<Statement>> Parser::stmt_parse()
 std::unique_ptr<Statement> Parser::expressionStatement()
 {
     auto expr = expression();
-    std::cout << tokenVector.token_peek().lexeme << std::endl;
     tokenVector.consume(TokenType::SEMICOLON, "(expressionStatement) expect ';' after declaration");
     return std::make_unique<ExpressionStatement>(std::move(expr));
 }
 
 std::unique_ptr<Statement> Parser::statement()
 {
-    std::cout << "Parsing statement at token type: " << static_cast<int>(tokenVector.token_peek().type) << std::endl;
     if (tokenVector.token_match(TokenType::PRINT))
         return printStatement();
 

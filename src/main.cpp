@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 #include "../include/Scanner.hpp"
@@ -10,9 +9,6 @@
 void testExpr();
 void testStatement();
 void testControlFlow(std::string source);
-void printTokens(const TokenVector &tokens);
-void printValue(Value val);
-void runFile(const std::string &path);
 TokenVector testScanner(const std::string &sourceCode);
 std::unique_ptr<Expr> testParse(TokenVector tokens);
 Value testEvaluator(std::unique_ptr<Expr> ast);
@@ -27,14 +23,14 @@ int main(int argc, char *argv[])
 
     else if (argc == 2)
     {
-        runFile(argv[1]);
+        std::string source = runFile(argv[1]);
+        testControlFlow(source);
     }
 
     else
     {
-        // testExpr();
-        // testStatement();
-        // testControlFlow();
+        std::cout << "Usage: lox [script]" << std::endl;
+        std::exit(64);
     }
 
     return 0;
@@ -42,7 +38,6 @@ int main(int argc, char *argv[])
 
 void testExpr()
 {
-    // scanner can do expressions like var x = 10 but parser cant yet
     std::string sourceCode = "30 + 10 * 5 * 9 + 301 - 31983 / 3 * (-1 + 4 / 2)";
     TokenVector tokens = testScanner(sourceCode);
     std::unique_ptr<Expr> ast = testParse(tokens);
@@ -72,7 +67,6 @@ void testControlFlow(std::string source)
 {
     try
     {
-        std::cout << source << std::endl;
         Scanner scanner(source);
         TokenVector tokens = scanner.scanTokens();
 
@@ -89,42 +83,6 @@ void testControlFlow(std::string source)
     {
         std::cerr << "RUNTIME/PARSER ERROR: " << e.what() << std::endl;
     }
-
-    // print environment:
-    // std::cout << "Environment Variables:" << std::endl;
-    // for (const auto &[key, value] : evaluator.getEnvironment()->getValues())
-    // {
-    //     std::cout << key << " = " << stringify(value) << std::endl;
-    // }
-}
-void printTokens(const TokenVector &tokens)
-{
-
-    for (const auto &token : tokens.getTokens())
-    {
-        std::cout
-            << " | Lexeme: " << token.lexeme
-            << " | Line: " << token.line << std::endl;
-    }
-}
-
-void printValue(Value val)
-{
-    std::visit([](auto &&arg)
-               { std::cout << arg << std::endl; }, val);
-}
-
-void runFile(const std::string &path)
-{
-    std::ifstream file(path);
-    if (!file.is_open())
-    {
-        std::cerr << "Could not open file: " << path << std::endl;
-        std::exit(74);
-    }
-
-    std::string source((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    testControlFlow(source);
 }
 
 TokenVector testScanner(const std::string &sourceCode)
