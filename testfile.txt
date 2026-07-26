@@ -12,4 +12,18 @@ print a;
 {
     print a;
 }
- 
+
+var z = 5;
+print z;
+
+if (x > 5) 
+{
+    y = 100;
+    print y;
+}
+else 
+{
+    y = 42;
+}
+
+print y;

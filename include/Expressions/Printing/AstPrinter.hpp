@@ -31,6 +31,12 @@ public:
 
         return result;
     }
+    std::string visitAssign(Assign &expr) override
+    {
+        std::string result = "Variable Name: " + expr.name;
+
+        return result;
+    }
 
 private:
     std::string parenthesize(const std::string &name, std::vector<Expr *> exprs)

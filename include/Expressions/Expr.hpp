@@ -97,3 +97,22 @@ public:
         return visitor.visitVariableExpr(*this);
     }
 };
+
+struct Assign : public Expr
+{
+public:
+    std::string name;
+    std::unique_ptr<Expr> value;
+
+    Assign(std::string name, std::unique_ptr<Expr> value) : name(std::move(name)), value(std::move(value)) {}
+
+    std::string accept(AstVisitor &visitor) override
+    {
+        return visitor.visitAssign(*this);
+    }
+
+    Value evaluate(EvaluatorVisitor &visitor) override
+    {
+        return visitor.visitAssignExpr(*this);
+    }
+};

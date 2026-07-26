@@ -146,7 +146,27 @@ std::unique_ptr<Expr> Parser::expr_parse()
 }
 std::unique_ptr<Expr> Parser::expression()
 {
-    return equality();
+    return assignment();
+}
+
+std::unique_ptr<Expr> Parser::assignment()
+{
+    auto expr = equality();
+
+    if (tokenVector.token_match(TokenType::EQUAL))
+    {
+        Token equals = tokenVector.previous();
+        auto right = assignment();
+        if (auto *varExpr = dynamic_cast<Variable *>(expr.get()))
+        {
+            expr = std::make_unique<Assign>(varExpr->name, std::move(right));
+        }
+        else
+        {
+            throw std::runtime_error("Invalid assignment target.");
+        }
+    }
+    return expr;
 }
 std::unique_ptr<Expr> Parser::equality()
 {

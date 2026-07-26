@@ -6,6 +6,7 @@ struct Grouping;
 struct Literal;
 struct Unary;
 struct Variable;
+struct Assign;
 
 struct EvaluatorVisitor
 {
@@ -15,4 +16,5 @@ struct EvaluatorVisitor
     virtual Value visitLiteralExpr(Literal &expr) = 0;
     virtual Value visitUnaryExpr(Unary &expr) = 0;
     virtual Value visitVariableExpr(Variable &expr) = 0;
+    virtual Value visitAssignExpr(Assign &expr) = 0;
 };

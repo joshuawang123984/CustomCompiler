@@ -6,6 +6,7 @@ struct Grouping;
 struct Literal;
 struct Unary;
 struct Variable;
+struct Assign;
 
 struct AstVisitor
 {
@@ -15,4 +16,5 @@ struct AstVisitor
     virtual std::string visitLiteral(Literal &expr) = 0;
     virtual std::string visitUnary(Unary &expr) = 0;
     virtual std::string visitVariable(Variable &expr) = 0;
+    virtual std::string visitAssign(Assign &expr) = 0;
 };

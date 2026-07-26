@@ -68,6 +68,7 @@ void testControlFlow(std::string source)
     {
         Scanner scanner(source);
         TokenVector tokens = scanner.scanTokens();
+        printTokens(tokens);
 
         Parser parser(tokens);
         std::vector<std::unique_ptr<Statement>> statements = parser.stmt_parse();

@@ -100,7 +100,12 @@ Value Evaluator::visitVariableExpr(Variable &expr)
 {
     return environment->get(expr.name);
 }
-
+Value Evaluator::visitAssignExpr(Assign &expr)
+{
+    Value value = evaluate(*expr.value);
+    environment->assign(expr.name, value);
+    return value;
+}
 void Evaluator::visitVarStatement(VarStatement &stmt)
 {
     Value val = nullptr;
@@ -121,7 +126,6 @@ void Evaluator::visitExpressionStatement(ExpressionStatement &stmt)
 {
     evaluate(*stmt.expression);
 }
-
 void Evaluator::visitIfStatement(IfStatement &stmt)
 {
     Value conditionResult = evaluate(*stmt.condition);
