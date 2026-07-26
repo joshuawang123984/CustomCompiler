@@ -27,3 +27,19 @@ else
 }
 
 print y;
+
+print "While Loop";
+var count = 0;
+while (count < 3) 
+{
+    print count;
+    count = count + 1;
+}
+
+print "For Loop";
+for (var i = 0; i < 3; i = i + 1)
+{
+    print i;
+    y = y + 1;
+    print y;
+}
