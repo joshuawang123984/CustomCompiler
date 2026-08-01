@@ -132,6 +132,26 @@ std::unique_ptr<Statement> Parser::blockStatement()
     tokenVector.consume(TokenType::RIGHT_BRACE, "expect '}' after block");
     return std::make_unique<BlockStatement>(std::move(statements));
 }
+std::unique_ptr<Statement> Parser::funcStatement()
+{
+    Token funcName = tokenVector.token_advance();
+    tokenVector.consume(TokenType::LEFT_PAREN, "Expect '(' after 'func'.");
+    std::vector<Token> arguments;
+
+    if (!tokenVector.check(TokenType::RIGHT_PAREN) && !tokenVector.isAtEnd() && !tokenVector.token_match(TokenType::EOF_TOKEN))
+    {
+        do
+        {
+            Token arg = tokenVector.consume(TokenType::IDENTIFIER, "Expect argument value.");
+            arguments.push_back(arg);
+        } while (tokenVector.token_match(TokenType::COMMA));
+    }
+
+    tokenVector.consume(TokenType::RIGHT_PAREN, "expect ')' after func clause");
+    auto body = statement();
+
+    return std::make_unique<FuncStatement>(std::move(funcName), std::move(arguments), std::move(body));
+}
 std::unique_ptr<Expr> Parser::expr_parse()
 {
     try

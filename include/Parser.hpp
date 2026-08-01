@@ -20,6 +20,7 @@ public:
     std::unique_ptr<Statement> whileStatement();
     std::unique_ptr<Statement> forStatement();
     std::unique_ptr<Statement> blockStatement();
+    std::unique_ptr<Statement> funcStatement();
 
     std::unique_ptr<Expr> expr_parse();
 
