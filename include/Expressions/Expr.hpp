@@ -1,6 +1,4 @@
 #pragma once
-#include <memory>
-#include "Helper/Token.hpp"
 #include "Printing/AstVisitor.hpp"
 #include "EvaluatorVisitor.hpp"
 

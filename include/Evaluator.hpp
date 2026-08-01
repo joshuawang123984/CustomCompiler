@@ -9,7 +9,7 @@ class Evaluator : public EvaluatorVisitor, public StatementVisitor
 {
 public:
     virtual ~Evaluator() = default;
-    std::unique_ptr<Environment> getEnvironment();
+    std::shared_ptr<Environment> getEnvironment();
 
     virtual Value evaluate(Expr &expr);
 
@@ -30,7 +30,7 @@ public:
     void visitFuncStatement(FuncStatement &stmt) override;
 
 private:
-    std::unique_ptr<Environment> environment = std::make_unique<Environment>();
+    std::shared_ptr<Environment> environment = std::make_shared<Environment>();
 
     void checkNumberOperands(const Value &left, const Value &right);
 };

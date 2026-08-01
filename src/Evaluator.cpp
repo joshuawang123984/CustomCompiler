@@ -1,6 +1,7 @@
 #include "../include/Statements/StatementImports.hpp"
 #include "Helper/Functions.hpp"
 #include "../include/Evaluator.hpp"
+#include "../include/LoxFunction.hpp"
 
 void Evaluator::checkNumberOperands(const Value &left, const Value &right)
 {
@@ -9,9 +10,9 @@ void Evaluator::checkNumberOperands(const Value &left, const Value &right)
     throw std::runtime_error("Operands must be numbers.");
 }
 
-std::unique_ptr<Environment> Evaluator::getEnvironment()
+std::shared_ptr<Environment> Evaluator::getEnvironment()
 {
-    return std::move(environment);
+    return environment;
 }
 
 Value Evaluator::evaluate(Expr &expr)
@@ -167,7 +168,7 @@ void Evaluator::visitForStatement(ForStatement &stmt)
 
 void Evaluator::visitBlockStatement(BlockStatement &stmt)
 {
-    auto blockEnv = std::make_unique<Environment>(environment.get());
+    auto blockEnv = std::make_shared<Environment>(environment);
 
     auto previousEnv = std::move(environment);
     environment = std::move(blockEnv);

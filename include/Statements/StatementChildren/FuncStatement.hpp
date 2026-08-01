@@ -1,5 +1,6 @@
 #include "../Statement.hpp"
 #include "../../Expressions/Expr.hpp"
+#include "../StatementVisitor.hpp"
 
 class FuncStatement : public Statement
 {

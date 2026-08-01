@@ -8,10 +8,10 @@ private:
     std::unordered_map<std::string, Value> values;
 
 public:
-    Environment *enclosing;
+    std::shared_ptr<Environment> enclosing;
 
     Environment() : enclosing(nullptr) {}
-    Environment(Environment *enclosing) : enclosing(enclosing) {}
+    Environment(std::shared_ptr<Environment> enclosing) : enclosing(enclosing) {}
 
     std::unordered_map<std::string, Value> getValues()
     {
