@@ -27,6 +27,7 @@ public:
     void visitWhileStatement(WhileStatement &stmt) override;
     void visitForStatement(ForStatement &stmt) override;
     void visitBlockStatement(BlockStatement &stmt) override;
+    void visitFuncStatement(FuncStatement &stmt) override;
 
 private:
     std::unique_ptr<Environment> environment = std::make_unique<Environment>();

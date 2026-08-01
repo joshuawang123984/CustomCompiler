@@ -7,3 +7,4 @@
 #include "StatementChildren/WhileStatement.hpp"
 #include "StatementChildren/ForStatement.hpp"
 #include "StatementChildren/BlockStatement.hpp"
+#include "StatementChildren/FuncStatement.hpp"

@@ -179,3 +179,9 @@ void Evaluator::visitBlockStatement(BlockStatement &stmt)
 
     environment = std::move(previousEnv);
 }
+
+void Evaluator::visitFuncStatement(FuncStatement &stmt)
+{
+    auto function = std::make_shared<LoxFunction>(&stmt, environment);
+    environment->define(stmt.name.lexeme, function);
+}
