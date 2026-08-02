@@ -43,6 +43,9 @@ std::unique_ptr<Statement> Parser::statement()
     if (tokenVector.token_match(TokenType::LEFT_BRACE))
         return blockStatement();
 
+    if (tokenVector.token_match(TokenType::FUNC))
+        return funcStatement();
+
     return expressionStatement();
 }
 std::unique_ptr<Statement> Parser::printStatement()
@@ -142,8 +145,12 @@ std::unique_ptr<Statement> Parser::funcStatement()
     {
         do
         {
-            Token arg = tokenVector.consume(TokenType::IDENTIFIER, "Expect argument value.");
-            arguments.push_back(arg);
+            // needs to consume a VAR tokentype ( then the identifier)
+            if (tokenVector.token_match(TokenType::VAR))
+            {
+                Token arg = tokenVector.consume(TokenType::IDENTIFIER, "Expect argument value.");
+                arguments.push_back(arg);
+            }
         } while (tokenVector.token_match(TokenType::COMMA));
     }
 

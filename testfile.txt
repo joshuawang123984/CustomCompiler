@@ -43,3 +43,8 @@ for (var i = 0; i < 3; i = i + 1)
     y = y + 1;
     print y;
 }
+
+func hey(var e, var f)
+{
+    return e + f;
+}
