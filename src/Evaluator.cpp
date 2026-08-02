@@ -194,4 +194,9 @@ void Evaluator::visitFuncStatement(FuncStatement &stmt)
 
 void Evaluator::visitReturnStatement(ReturnStatement &stmt)
 {
+    Value value = nullptr;
+    if (stmt.value != nullptr)
+        value = evaluate(*stmt.value);
+
+    throw ReturnException(value, "return statement");
 }

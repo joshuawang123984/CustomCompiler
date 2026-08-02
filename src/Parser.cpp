@@ -162,10 +162,19 @@ std::unique_ptr<Statement> Parser::funcStatement()
 
     return std::make_unique<FuncStatement>(std::move(funcName), std::move(arguments), std::move(body));
 }
-std::unique_ptr<Statement> returnStatement()
+std::unique_ptr<Statement> Parser::returnStatement()
 {
+    Token keyword = tokenVector.previous();
+    std::unique_ptr<Expr> value = nullptr;
 
-    return std::make_unique<ReturnStatement>();
+    if (!tokenVector.check(TokenType::SEMICOLON))
+    {
+        value = expression();
+    }
+
+    tokenVector.consume(TokenType::SEMICOLON, "Expect ';' after return value.");
+
+    return std::make_unique<ReturnStatement>(keyword, std::move(value));
 }
 std::unique_ptr<Expr> Parser::expr_parse()
 {
