@@ -48,3 +48,13 @@ func hey(var e, var f)
 {
     return e + f;
 }
+
+print hey(x, y);
+
+var g = hey(x, y);
+print g;
+
+print hey(5, 6);
+
+var h = hey(x, y);
+print h;
