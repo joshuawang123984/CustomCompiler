@@ -46,6 +46,9 @@ std::unique_ptr<Statement> Parser::statement()
     if (tokenVector.token_match(TokenType::FUNC))
         return funcStatement();
 
+    if (tokenVector.token_match(TokenType::RETURN))
+        return returnStatement();
+
     return expressionStatement();
 }
 std::unique_ptr<Statement> Parser::printStatement()
@@ -158,6 +161,11 @@ std::unique_ptr<Statement> Parser::funcStatement()
     auto body = statement();
 
     return std::make_unique<FuncStatement>(std::move(funcName), std::move(arguments), std::move(body));
+}
+std::unique_ptr<Statement> returnStatement()
+{
+
+    return std::make_unique<ReturnStatement>();
 }
 std::unique_ptr<Expr> Parser::expr_parse()
 {

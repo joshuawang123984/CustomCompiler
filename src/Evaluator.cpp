@@ -191,3 +191,7 @@ void Evaluator::visitFuncStatement(FuncStatement &stmt)
     auto function = std::make_shared<LoxFunction>(&stmt, environment);
     environment->define(stmt.name.lexeme, function);
 }
+
+void Evaluator::visitReturnStatement(ReturnStatement &stmt)
+{
+}

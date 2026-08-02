@@ -8,6 +8,7 @@ class WhileStatement;
 class ForStatement;
 class BlockStatement;
 class FuncStatement;
+class ReturnStatement;
 
 class StatementVisitor
 {
@@ -21,4 +22,5 @@ public:
     virtual void visitForStatement(ForStatement &stmt) = 0;
     virtual void visitBlockStatement(BlockStatement &stmt) = 0;
     virtual void visitFuncStatement(FuncStatement &stmt) = 0;
+    virtual void visitReturnStatement(ReturnStatement &stmt) = 0;
 };

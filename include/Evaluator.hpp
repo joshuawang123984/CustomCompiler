@@ -29,6 +29,7 @@ public:
     void visitForStatement(ForStatement &stmt) override;
     void visitBlockStatement(BlockStatement &stmt) override;
     void visitFuncStatement(FuncStatement &stmt) override;
+    void visitReturnStatement(ReturnStatement &stmt) override;
 
 private:
     std::shared_ptr<Environment> environment = std::make_shared<Environment>();
