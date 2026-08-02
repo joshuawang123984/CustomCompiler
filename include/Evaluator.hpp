@@ -10,6 +10,7 @@ class Evaluator : public EvaluatorVisitor, public StatementVisitor
 public:
     virtual ~Evaluator() = default;
     std::shared_ptr<Environment> getEnvironment();
+    void setEnvironment(std::shared_ptr<Environment> env);
 
     virtual Value evaluate(Expr &expr);
 

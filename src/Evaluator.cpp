@@ -15,6 +15,11 @@ std::shared_ptr<Environment> Evaluator::getEnvironment()
     return environment;
 }
 
+void Evaluator::setEnvironment(std::shared_ptr<Environment> env)
+{
+    environment = env;
+}
+
 Value Evaluator::evaluate(Expr &expr)
 {
     return expr.evaluate(*this);

@@ -1,5 +1,6 @@
 #pragma once
 #include "Helper/Types.hpp"
+#include "Helper/Exceptions.hpp"
 #include <vector>
 #include <memory>
 
