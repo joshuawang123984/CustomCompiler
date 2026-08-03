@@ -1,6 +1,7 @@
 #pragma once
 #include "Printing/AstVisitor.hpp"
 #include "EvaluatorVisitor.hpp"
+#include <vector>
 
 struct Expr
 {
