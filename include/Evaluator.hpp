@@ -20,6 +20,7 @@ public:
     Value visitUnaryExpr(Unary &expr) override;
     Value visitVariableExpr(Variable &expr) override;
     Value visitAssignExpr(Assign &expr) override;
+    Value visitCallExpr(Call &expr) override;
 
     void visitVarStatement(VarStatement &stmt) override;
     void visitPrintStatement(PrintStatement &stmt) override;

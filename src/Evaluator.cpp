@@ -112,6 +112,30 @@ Value Evaluator::visitAssignExpr(Assign &expr)
     environment->assign(expr.name, value);
     return value;
 }
+Value Evaluator::visitCallExpr(Call &expr)
+{
+    Value calleeValue = evaluate(*expr.callee);
+
+    if (!std::holds_alternative<std::shared_ptr<Callable>>(calleeValue))
+    {
+        throw std::runtime_error("Can only call functions.");
+    }
+    auto function = std::get<std::shared_ptr<Callable>>(calleeValue);
+
+    std::vector<Value> arguments;
+    for (const auto &arg : expr.arguments)
+    {
+        arguments.push_back(evaluate(*arg));
+    }
+
+    if (arguments.size() != function->arity())
+    {
+        throw std::runtime_error("Expected " + std::to_string(function->arity()) +
+                                 " arguments but got " + std::to_string(arguments.size()) + ".");
+    }
+
+    return function->call(*this, arguments);
+}
 void Evaluator::visitVarStatement(VarStatement &stmt)
 {
     Value val = nullptr;

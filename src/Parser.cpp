@@ -274,7 +274,40 @@ std::unique_ptr<Expr> Parser::unary()
         return std::make_unique<Unary>(oper, std::move(right));
     }
 
-    return primary();
+    return call();
+}
+std::unique_ptr<Expr> Parser::call()
+{
+    auto expr = primary();
+
+    while (true)
+    {
+        if (tokenVector.token_match(TokenType::LEFT_PAREN))
+        {
+            expr = finishCall(std::move(expr));
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    return expr;
+}
+std::unique_ptr<Expr> Parser::finishCall(std::unique_ptr<Expr> callee)
+{
+    std::vector<std::unique_ptr<Expr>> arguments;
+
+    if (!tokenVector.check(TokenType::RIGHT_PAREN))
+    {
+        do
+        {
+            arguments.push_back(expression());
+        } while (tokenVector.token_match(TokenType::COMMA));
+    }
+
+    Token paren = tokenVector.consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
+    return std::make_unique<Call>(std::move(callee), paren, std::move(arguments));
 }
 std::unique_ptr<Expr> Parser::primary()
 {

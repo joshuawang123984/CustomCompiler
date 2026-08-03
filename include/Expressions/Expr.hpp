@@ -114,3 +114,23 @@ public:
         return visitor.visitAssignExpr(*this);
     }
 };
+
+struct Call : public Expr
+{
+public:
+    std::unique_ptr<Expr> callee;
+    Token paren;
+    std::vector<std::unique_ptr<Expr>> arguments;
+
+    Call(std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments) : callee(std::move(callee)), paren(std::move(paren)), arguments(std::move(arguments)) {}
+
+    std::string accept(AstVisitor &visitor) override
+    {
+        return visitor.visitCall(*this);
+    }
+
+    Value evaluate(EvaluatorVisitor &visitor) override
+    {
+        return visitor.visitCallExpr(*this);
+    }
+};

@@ -7,6 +7,7 @@ struct Literal;
 struct Unary;
 struct Variable;
 struct Assign;
+struct Call;
 
 struct EvaluatorVisitor
 {
@@ -17,4 +18,5 @@ struct EvaluatorVisitor
     virtual Value visitUnaryExpr(Unary &expr) = 0;
     virtual Value visitVariableExpr(Variable &expr) = 0;
     virtual Value visitAssignExpr(Assign &expr) = 0;
+    virtual Value visitCallExpr(Call &expr) = 0;
 };

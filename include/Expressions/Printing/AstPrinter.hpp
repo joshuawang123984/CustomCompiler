@@ -37,6 +37,12 @@ public:
 
         return result;
     }
+    std::string visitCall(Call &expr) override
+    {
+        std::string result = "Function Call: " + print(expr);
+
+        return result;
+    }
 
 private:
     std::string parenthesize(const std::string &name, std::vector<Expr *> exprs)
