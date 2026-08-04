@@ -9,6 +9,10 @@ void Evaluator::checkNumberOperands(const Value &left, const Value &right)
         return;
     throw std::runtime_error("Operands must be numbers.");
 }
+void Evaluator::resolve(Expr &expr, int depth)
+{
+    locals[&expr] = depth;
+}
 
 std::shared_ptr<Environment> Evaluator::getEnvironment()
 {
@@ -104,12 +108,24 @@ Value Evaluator::visitUnaryExpr(Unary &expr)
 
 Value Evaluator::visitVariableExpr(Variable &expr)
 {
-    return environment->get(expr.name);
+    auto it = locals.find(&expr);
+    if (it != locals.end())
+    {
+        return environment->getAt(it->second, expr.name.lexeme);
+    }
+    return globals->get(expr.name.lexeme);
 }
 Value Evaluator::visitAssignExpr(Assign &expr)
 {
     Value value = evaluate(*expr.value);
-    environment->assign(expr.name, value);
+    auto it = locals.find(&expr);
+    if (it != locals.end())
+    {
+        environment->assignAt(it->second, expr.name.lexeme, value);
+    }
+
+    globals->assign(expr.name.lexeme, value);
+
     return value;
 }
 Value Evaluator::visitCallExpr(Call &expr)
@@ -144,7 +160,7 @@ void Evaluator::visitVarStatement(VarStatement &stmt)
         val = evaluate(*stmt.initializer);
     }
 
-    environment->define(stmt.name, val);
+    environment->define(stmt.name.lexeme, val);
 }
 void Evaluator::visitPrintStatement(PrintStatement &stmt)
 {

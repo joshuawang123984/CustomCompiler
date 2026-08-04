@@ -65,7 +65,7 @@ std::unique_ptr<Statement> Parser::varDeclaration()
         initializer = expression();
 
     tokenVector.consume(TokenType::SEMICOLON, "(varDeclaration) expect ';' after declaration");
-    return std::make_unique<VarStatement>(nameToken.lexeme, std::move(initializer));
+    return std::make_unique<VarStatement>(nameToken, std::move(initializer));
 }
 std::unique_ptr<Statement> Parser::ifStatement()
 {
@@ -323,7 +323,7 @@ std::unique_ptr<Expr> Parser::primary()
 
     if (tokenVector.token_match(TokenType::IDENTIFIER))
     {
-        return std::make_unique<Variable>(tokenVector.previous().lexeme);
+        return std::make_unique<Variable>(tokenVector.previous());
     }
 
     if (tokenVector.token_match(TokenType::LEFT_PAREN))

@@ -9,6 +9,7 @@ class Evaluator : public EvaluatorVisitor, public StatementVisitor
 {
 public:
     virtual ~Evaluator() = default;
+    void resolve(Expr &expr, int depth);
     std::shared_ptr<Environment> getEnvironment();
     void setEnvironment(std::shared_ptr<Environment> env);
 
@@ -33,7 +34,9 @@ public:
     void visitReturnStatement(ReturnStatement &stmt) override;
 
 private:
-    std::shared_ptr<Environment> environment = std::make_shared<Environment>();
+    std::shared_ptr<Environment> globals = std::make_shared<Environment>();
+    std::shared_ptr<Environment> environment = globals;
+    std::unordered_map<Expr *, int> locals;
 
     void checkNumberOperands(const Value &left, const Value &right);
 };

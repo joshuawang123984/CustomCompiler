@@ -82,9 +82,9 @@ struct Unary : public Expr
 struct Variable : public Expr
 {
 public:
-    const std::string name;
+    const Token name;
 
-    Variable(std::string name) : name(std::move(name)) {}
+    Variable(Token name) : name(std::move(name)) {}
 
     std::string accept(AstVisitor &visitor) override
     {
@@ -100,10 +100,10 @@ public:
 struct Assign : public Expr
 {
 public:
-    std::string name;
+    Token name;
     std::unique_ptr<Expr> value;
 
-    Assign(std::string name, std::unique_ptr<Expr> value) : name(std::move(name)), value(std::move(value)) {}
+    Assign(Token name, std::unique_ptr<Expr> value) : name(std::move(name)), value(std::move(value)) {}
 
     std::string accept(AstVisitor &visitor) override
     {

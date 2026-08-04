@@ -56,4 +56,26 @@ public:
 
         throw std::runtime_error("Undefined variable '" + name + "'.");
     }
+
+    Value getAt(int distance, const std::string &name)
+    {
+        Environment *env = this;
+        for (int i = 0; i < distance; ++i)
+        {
+            env = env->enclosing.get();
+        }
+
+        return env->get(name);
+    }
+
+    void assignAt(int distance, const std::string &name, const Value &value)
+    {
+        Environment *env = this;
+        for (int i = 0; i < distance; ++i)
+        {
+            env = env->enclosing.get();
+        }
+
+        env->assign(name, value);
+    }
 };

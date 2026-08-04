@@ -5,10 +5,11 @@
 #include "../include/Parser.hpp"
 #include "../include/Expressions/Printing/AstPrinter.hpp"
 #include "../include/Evaluator.hpp"
+#include "../include/Resolver.hpp"
 
 void testExpr();
 void testStatement();
-void testControlFlow(std::string source);
+void testComplete(std::string source);
 TokenVector testScanner(const std::string &sourceCode);
 std::unique_ptr<Expr> testParse(TokenVector tokens);
 Value testEvaluator(std::unique_ptr<Expr> ast);
@@ -24,7 +25,7 @@ int main(int argc, char *argv[])
     else if (argc == 2)
     {
         std::string source = runFile(argv[1]);
-        testControlFlow(source);
+        testComplete(source);
     }
 
     else
@@ -62,7 +63,7 @@ void testStatement()
     }
 }
 
-void testControlFlow(std::string source)
+void testComplete(std::string source)
 {
     try
     {
@@ -74,6 +75,9 @@ void testControlFlow(std::string source)
         std::vector<std::unique_ptr<Statement>> statements = parser.stmt_parse();
 
         Evaluator evaluator;
+        Resolver resolver(evaluator);
+        resolver.resolve(statements);
+
         for (const auto &stmt : statements)
         {
             stmt->accept(evaluator);

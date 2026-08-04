@@ -60,3 +60,13 @@ var h = hey(x, y);
 print h;
 
 print hey(x, y);
+
+var a = "global";
+{
+    func showA() {
+        print a;
+    }
+    showA();       // prints "global"
+    var a = "block";
+    showA();       // should still print "global" (showA's closure captured the *global* a),
+}

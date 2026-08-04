@@ -27,13 +27,13 @@ public:
     }
     std::string visitVariable(Variable &expr) override
     {
-        std::string result = "Variable Name: " + expr.name;
+        std::string result = "Variable Name: " + expr.name.lexeme;
 
         return result;
     }
     std::string visitAssign(Assign &expr) override
     {
-        std::string result = "Variable Name: " + expr.name;
+        std::string result = "Variable Name: " + expr.name.lexeme;
 
         return result;
     }
