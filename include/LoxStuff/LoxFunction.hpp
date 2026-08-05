@@ -10,6 +10,7 @@ class LoxFunction : public Callable
 public:
     LoxFunction(FuncStatement *declaration, std::shared_ptr<Environment> closure) : declaration(declaration), closure(std::move(closure)) {}
 
+    std::shared_ptr<LoxFunction> bind(std::shared_ptr<LoxInstance> instance);
     Value call(Evaluator &evaluator, std::vector<Value> &arguments) override;
     size_t arity() const override;
 
