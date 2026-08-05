@@ -228,7 +228,7 @@ void Evaluator::visitBlockStatement(BlockStatement &stmt)
 
 void Evaluator::visitFuncStatement(FuncStatement &stmt)
 {
-    auto function = std::make_shared<LoxFunction>(&stmt, environment);
+    std::shared_ptr<LoxFunction> function = std::make_shared<LoxFunction>(&stmt, environment);
     environment->define(stmt.name.lexeme, function);
 }
 
@@ -253,7 +253,6 @@ void Evaluator::visitClassStatement(ClassStatement &stmt)
         methods[funcStmt->name.lexeme] = function;
     }
 
-    auto klass = std::make_unique<LoxClass>(stmt.name.lexeme, methods);
-    // cant conver this class to its base class. copy what was done to funcstatement to get this to work
-    environment->assign(stmt.name.lexeme, Value(klass));
+    std::shared_ptr<LoxClass> klass = std::make_unique<LoxClass>(stmt.name.lexeme, methods);
+    environment->assign(stmt.name.lexeme, klass);
 }
