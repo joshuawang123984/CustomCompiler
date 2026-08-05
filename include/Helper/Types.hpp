@@ -4,5 +4,6 @@
 #include <memory>
 
 class Callable;
+class LoxInstance;
 
-using Value = std::variant<double, bool, std::string, std::nullptr_t, std::shared_ptr<Callable>>;
+using Value = std::variant<double, bool, std::string, std::nullptr_t, std::shared_ptr<Callable>, std::shared_ptr<LoxInstance>>;
