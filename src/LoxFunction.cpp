@@ -1,4 +1,4 @@
-#include "../include/LoxFunction.hpp"
+#include "../include/LoxStuff/LoxFunction.hpp"
 #include "../include/Statements/StatementChildren/FuncStatement.hpp"
 #include "../include/Environment.hpp"
 #include "../include/Evaluator.hpp"

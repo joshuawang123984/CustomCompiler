@@ -1,4 +1,4 @@
-#include "../include/LoxInstance.hpp"
+#include "../include/LoxStuff/LoxInstance.hpp"
 
 Value LoxInstance::get(const std::string &name)
 {

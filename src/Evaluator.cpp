@@ -1,8 +1,7 @@
 #include "../include/Statements/StatementImports.hpp"
 #include "Helper/Functions.hpp"
 #include "../include/Evaluator.hpp"
-#include "../include/LoxFunction.hpp"
-#include "../include/LoxClass.hpp"
+#include "../include/LoxStuff/LoxImports.hpp"
 
 void Evaluator::checkNumberOperands(const Value &left, const Value &right)
 {
@@ -245,6 +244,16 @@ void Evaluator::visitReturnStatement(ReturnStatement &stmt)
 void Evaluator::visitClassStatement(ClassStatement &stmt)
 {
     environment->define(stmt.name.lexeme, nullptr);
-    LoxClass klass = new LoxClass(stmt.name.lexeme);
-    environment->assign(stmt.name, klass);
+
+    std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods;
+    for (const auto &methodStmt : stmt.methods)
+    {
+        auto *funcStmt = dynamic_cast<FuncStatement *>(methodStmt.get());
+        auto function = std::make_shared<LoxFunction>(funcStmt, environment);
+        methods[funcStmt->name.lexeme] = function;
+    }
+
+    auto klass = std::make_unique<LoxClass>(stmt.name.lexeme, methods);
+    // cant conver this class to its base class. copy what was done to funcstatement to get this to work
+    environment->assign(stmt.name.lexeme, Value(klass));
 }

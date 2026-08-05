@@ -1,5 +1,5 @@
 #pragma once
-#include "LoxFunction.hpp"
+#include "LoxCallable.hpp"
 #include <string>
 #include <unordered_map>
 #include <memory>
@@ -14,7 +14,7 @@ private:
 public:
     std::string name;
 
-    LoxClass(std::string name, std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods) : name(std::move(name)), methods(std::move(methods)) {}
+    LoxClass(std::string name, std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods) : methods(std::move(methods)), name(std::move(name)) {}
     std::shared_ptr<LoxFunction> findMethod(const std::string &methodName);
 
     Value call(Evaluator &evaluator, std::vector<Value> &arguments) override;
