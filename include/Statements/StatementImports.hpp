@@ -9,3 +9,4 @@
 #include "StatementChildren/BlockStatement.hpp"
 #include "StatementChildren/FuncStatement.hpp"
 #include "StatementChildren/ReturnStatement.hpp"
+#include "StatementChildren/ClassStatement.hpp"

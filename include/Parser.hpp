@@ -22,6 +22,7 @@ public:
     std::unique_ptr<Statement> blockStatement();
     std::unique_ptr<Statement> funcStatement();
     std::unique_ptr<Statement> returnStatement();
+    std::unique_ptr<Statement> classStatement();
 
     std::unique_ptr<Expr> expr_parse();
 

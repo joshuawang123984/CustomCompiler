@@ -2,6 +2,7 @@
 #include "Helper/Functions.hpp"
 #include "../include/Evaluator.hpp"
 #include "../include/LoxFunction.hpp"
+#include "../include/LoxClass.hpp"
 
 void Evaluator::checkNumberOperands(const Value &left, const Value &right)
 {
@@ -239,4 +240,11 @@ void Evaluator::visitReturnStatement(ReturnStatement &stmt)
         value = evaluate(*stmt.value);
 
     throw ReturnException(value, "return statement");
+}
+
+void Evaluator::visitClassStatement(ClassStatement &stmt)
+{
+    environment->define(stmt.name.lexeme, nullptr);
+    LoxClass klass = new LoxClass(stmt.name.lexeme);
+    environment->assign(stmt.name, klass);
 }

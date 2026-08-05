@@ -32,6 +32,7 @@ public:
     void visitBlockStatement(BlockStatement &stmt) override;
     void visitFuncStatement(FuncStatement &stmt) override;
     void visitReturnStatement(ReturnStatement &stmt) override;
+    void visitClassStatement(ClassStatement &stmt) override;
 
 private:
     std::shared_ptr<Environment> globals = std::make_shared<Environment>();

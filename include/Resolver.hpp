@@ -183,4 +183,9 @@ public:
         if (stmt.value != nullptr)
             resolve(*stmt.value);
     }
+    void visitClassStatement(ClassStatement &stmt) override
+    {
+        declare(stmt.name);
+        define(stmt.name);
+    }
 };

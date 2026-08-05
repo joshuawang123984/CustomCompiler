@@ -8,6 +8,7 @@ class Evaluator;
 class Environment;
 class FuncStatement;
 
+// LoxClass uses this classes as a base, might separate this (maybe move to Helper folder?)
 class Callable
 {
 public:

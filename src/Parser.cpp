@@ -131,7 +131,7 @@ std::unique_ptr<Statement> Parser::blockStatement()
     std::vector<std::unique_ptr<Statement>> statements;
     // add the current environment statements to this.
 
-    while (!tokenVector.check(TokenType::RIGHT_BRACE) && !tokenVector.isAtEnd() && !tokenVector.token_match(TokenType::EOF_TOKEN))
+    while (!tokenVector.check(TokenType::RIGHT_BRACE) && !tokenVector.isAtEnd())
     {
         statements.push_back(statement());
     }
@@ -175,6 +175,21 @@ std::unique_ptr<Statement> Parser::returnStatement()
     tokenVector.consume(TokenType::SEMICOLON, "Expect ';' after return value.");
 
     return std::make_unique<ReturnStatement>(keyword, std::move(value));
+}
+std::unique_ptr<Statement> Parser::classStatement()
+{
+    Token name = tokenVector.consume(TokenType::IDENTIFIER, "Expect class name");
+    tokenVector.consume(TokenType::LEFT_BRACE, "Expect '{' after class name");
+
+    std::vector<std::unique_ptr<Statement>> methods;
+    while (!tokenVector.check(TokenType::RIGHT_BRACE) && !tokenVector.isAtEnd() && !tokenVector.token_match(TokenType::EOF_TOKEN))
+    {
+        methods.push_back(funcStatement());
+    }
+
+    tokenVector.consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
+
+    return std::make_unique<ClassStatement>(name, methods);
 }
 std::unique_ptr<Expr> Parser::expr_parse()
 {
