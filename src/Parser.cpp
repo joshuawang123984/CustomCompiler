@@ -189,7 +189,7 @@ std::unique_ptr<Statement> Parser::classStatement()
 
     tokenVector.consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
 
-    return std::make_unique<ClassStatement>(name, methods);
+    return std::make_unique<ClassStatement>(std::move(name), std::move(methods));
 }
 std::unique_ptr<Expr> Parser::expr_parse()
 {

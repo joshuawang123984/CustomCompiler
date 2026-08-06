@@ -3,7 +3,12 @@
 #include "../include/Environment.hpp"
 #include "../include/Evaluator.hpp"
 
-std::shared_ptr<LoxFunction> LoxFunction::bind(std::shared_ptr<LoxInstance> instance);
+std::shared_ptr<LoxFunction> LoxFunction::bind(std::shared_ptr<LoxInstance> instance)
+{
+    auto environment = std::make_shared<Environment>(closure);
+    environment->define("this", instance);
+    return std::make_shared<LoxFunction>(declaration, environment);
+}
 
 Value LoxFunction::call(Evaluator &evaluator, std::vector<Value> &arguments)
 {
