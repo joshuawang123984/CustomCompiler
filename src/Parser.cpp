@@ -49,6 +49,9 @@ std::unique_ptr<Statement> Parser::statement()
     if (tokenVector.token_match(TokenType::RETURN))
         return returnStatement();
 
+    if (tokenVector.token_match(TokenType::CLASS))
+        return classStatement();
+
     return expressionStatement();
 }
 std::unique_ptr<Statement> Parser::printStatement()

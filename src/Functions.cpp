@@ -24,6 +24,12 @@ std::string stringify(Value value)
     if (std::holds_alternative<std::string>(value))
         return std::get<std::string>(value);
 
+    if (std::holds_alternative<std::shared_ptr<Callable>>(value))
+        return "Callable";
+
+    if (std::holds_alternative<std::shared_ptr<LoxInstance>>(value))
+        return "Lox Instance";
+
     if (std::holds_alternative<std::nullptr_t>(value))
         return "nil";
 
