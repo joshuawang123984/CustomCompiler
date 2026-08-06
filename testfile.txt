@@ -74,3 +74,10 @@ var a = "global";
 class Empty {}
 var e = Empty();
 print e;
+
+class Point {}
+var p = Point();
+p.x = 3;
+p.y = 4;
+print p.x;
+print p.y;

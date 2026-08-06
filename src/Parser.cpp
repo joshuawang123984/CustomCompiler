@@ -304,6 +304,11 @@ std::unique_ptr<Expr> Parser::call()
         {
             expr = finishCall(std::move(expr));
         }
+        else if (tokenVector.token_match(TokenType::DOT))
+        {
+            Token name = tokenVector.consume(TokenType::IDENTIFIER, "Expect property name after '.'.");
+            expr = std::make_unique<Get>(std::move(expr), std::move(name));
+        }
         else
         {
             break;

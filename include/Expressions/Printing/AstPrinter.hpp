@@ -44,6 +44,14 @@ public:
         return result;
     }
 
+    std::string visitGet(Get &expr) override
+    {
+    }
+
+    std::string visitSet(Set &expr) override
+    {
+    }
+
 private:
     std::string parenthesize(const std::string &name, std::vector<Expr *> exprs)
     {

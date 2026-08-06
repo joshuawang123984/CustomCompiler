@@ -8,6 +8,8 @@ struct Unary;
 struct Variable;
 struct Assign;
 struct Call;
+struct Get;
+struct Set;
 
 struct EvaluatorVisitor
 {
@@ -19,4 +21,6 @@ struct EvaluatorVisitor
     virtual Value visitVariableExpr(Variable &expr) = 0;
     virtual Value visitAssignExpr(Assign &expr) = 0;
     virtual Value visitCallExpr(Call &expr) = 0;
+    virtual Value visitGetExpr(Get &expr) = 0;
+    virtual Value visitSetExpr(Set &expr) = 0;
 };

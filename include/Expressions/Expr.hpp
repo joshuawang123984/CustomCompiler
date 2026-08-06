@@ -135,3 +135,33 @@ public:
         return visitor.visitCallExpr(*this);
     }
 };
+
+struct Get : public Expr
+{
+    Get() {}
+
+    std::string accept(AstVisitor &visitor) override
+    {
+        return visitor.visitGet(*this);
+    }
+
+    Value evaluate(EvaluatorVisitor &visitor) override
+    {
+        return visitor.visitGetExpr(*this);
+    }
+};
+
+struct Set : public Expr
+{
+    Set() {}
+
+    std::string accept(AstVisitor &visitor) override
+    {
+        return visitor.visitSet(*this);
+    }
+
+    Value evaluate(EvaluatorVisitor &visitor) override
+    {
+        return visitor.visitSetExpr(*this);
+    }
+};
