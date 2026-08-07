@@ -152,6 +152,30 @@ Value Evaluator::visitCallExpr(Call &expr)
 
     return function->call(*this, arguments);
 }
+Value Evaluator::visitGetExpr(Get &expr)
+{
+    Value object = evaluate(*expr.object);
+
+    if (!std::holds_alternative<std::shared_ptr<LoxInstance>>(object))
+    {
+        throw std::runtime_error("Only instances have properties.");
+    }
+
+    return std::get<std::shared_ptr<LoxInstance>>(object)->get(expr.name.lexeme);
+}
+Value Evaluator::visitSetExpr(Set &expr)
+{
+    Value object = evaluate(*expr.object);
+
+    if (!std::holds_alternative<std::shared_ptr<LoxInstance>>(object))
+    {
+        throw std::runtime_error("Only instances have fields.");
+    }
+
+    Value value = evaluate(*expr.value);
+    std::get<std::shared_ptr<LoxInstance>>(object)->set(expr.name.lexeme, value);
+    return value;
+}
 void Evaluator::visitVarStatement(VarStatement &stmt)
 {
     Value val = nullptr;

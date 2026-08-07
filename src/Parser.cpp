@@ -223,6 +223,10 @@ std::unique_ptr<Expr> Parser::assignment()
         {
             expr = std::make_unique<Assign>(varExpr->name, std::move(right));
         }
+        else if (auto *getExpr = dynamic_cast<Get *>(expr.get()))
+        {
+            expr = std::make_unique<Set>(std::move(getExpr->object), getExpr->name, std::move(right));
+        }
         else
         {
             throw std::runtime_error("Invalid assignment target.");

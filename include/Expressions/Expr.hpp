@@ -138,7 +138,12 @@ public:
 
 struct Get : public Expr
 {
-    Get() {}
+private:
+public:
+    std::unique_ptr<Expr> object;
+    Token name;
+
+    Get(std::unique_ptr<Expr> object, Token name) : object(std::move(object)), name(std::move(name)) {}
 
     std::string accept(AstVisitor &visitor) override
     {
@@ -153,7 +158,13 @@ struct Get : public Expr
 
 struct Set : public Expr
 {
-    Set() {}
+private:
+public:
+    std::unique_ptr<Expr> object;
+    Token name;
+    std::unique_ptr<Expr> value;
+
+    Set(std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value) : object(std::move(object)), name(std::move(name)), value(std::move(value)) {}
 
     std::string accept(AstVisitor &visitor) override
     {

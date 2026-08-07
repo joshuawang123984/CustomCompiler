@@ -22,6 +22,8 @@ public:
     Value visitVariableExpr(Variable &expr) override;
     Value visitAssignExpr(Assign &expr) override;
     Value visitCallExpr(Call &expr) override;
+    Value visitGetExpr(Get &expr) override;
+    Value visitSetExpr(Set &expr) override;
 
     void visitVarStatement(VarStatement &stmt) override;
     void visitPrintStatement(PrintStatement &stmt) override;

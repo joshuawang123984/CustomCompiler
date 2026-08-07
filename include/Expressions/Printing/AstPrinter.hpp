@@ -46,10 +46,16 @@ public:
 
     std::string visitGet(Get &expr) override
     {
+        std::string result = "Get Call: " + expr.name.lexeme;
+
+        return result;
     }
 
     std::string visitSet(Set &expr) override
     {
+        std::string result = "Set Call: " + expr.name.lexeme;
+
+        return result;
     }
 
 private:

@@ -120,6 +120,19 @@ public:
         return nullptr;
     }
 
+    Value visitGetExpr(Get &expr) override
+    {
+        resolve(*expr.object);
+        return nullptr;
+    }
+
+    Value visitSetExpr(Set &expr) override
+    {
+        resolve(*expr.object);
+        resolve(*expr.value);
+        return nullptr;
+    }
+
     void visitBlockStatement(BlockStatement &stmt) override
     {
         beginScope();
