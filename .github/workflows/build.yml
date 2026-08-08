@@ -8,6 +8,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Debug - list files
+        run: ls -la
+      - name: Build with Make
+        run: make
+        working-directory: interpreter
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Build with Make
         run: make
         working-directory: interpreter
