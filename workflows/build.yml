@@ -10,5 +10,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Build with Make
         run: make
+        working-directory: interpreter
       - name: Run Test
         run: ./compiler
+        working-directory: interpreter
