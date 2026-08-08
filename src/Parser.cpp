@@ -360,5 +360,10 @@ std::unique_ptr<Expr> Parser::primary()
         return std::make_unique<Grouping>(std::move(expr));
     }
 
+    if (tokenVector.token_match(TokenType::THIS))
+    {
+        return std::make_unique<Variable>(tokenVector.previous());
+    }
+
     throw std::runtime_error("Expect expression. Failed Token: " + tokenVector.token_peek().lexeme);
 }

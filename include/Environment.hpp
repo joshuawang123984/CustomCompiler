@@ -54,6 +54,7 @@ public:
             return enclosing->get(name);
         }
 
+        std::cout << name << std::endl;
         throw std::runtime_error("Undefined variable '" + name + "'.");
     }
 

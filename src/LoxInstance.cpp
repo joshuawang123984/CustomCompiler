@@ -17,5 +17,5 @@ Value LoxInstance::get(const std::string &name)
 }
 void LoxInstance::set(const std::string &name, const Value &value)
 {
-    fields.insert({name, value});
+    fields[name] = value;
 }

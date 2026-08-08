@@ -200,5 +200,15 @@ public:
     {
         declare(stmt.name);
         define(stmt.name);
+
+        beginScope();
+        scopes.back()["this"] = true;
+
+        for (const auto &method : stmt.methods)
+        {
+            resolve(*method);
+        }
+
+        endScope();
     }
 };

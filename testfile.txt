@@ -93,7 +93,7 @@ g.hello();
 //fails on test case because (lacks (TokenType::THIS))
 class Counter {
     init() {
-        this.count = 0;
+        this.count = 5;
     }
     increment() {
         this.count = this.count + 1;
@@ -104,3 +104,21 @@ var c = Counter();
 c.increment();
 c.increment();
 c.increment();
+
+class Counter {
+    init() { this.count = 0; }
+    increment() { this.count = this.count + 1; }
+    get() { return this.count; }
+}
+var a = Counter();
+var b = Counter();
+a.increment();
+a.increment();
+b.increment();
+print a.get();
+print b.get();
+
+class Foo {
+    init() { this.x = 1; }
+}
+print Foo();
