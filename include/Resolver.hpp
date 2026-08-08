@@ -133,6 +133,12 @@ public:
         return nullptr;
     }
 
+    Value visitSuperExpr(Super &expr) override
+    {
+        resolveLocal(expr, expr.keyword);
+        return nullptr;
+    }
+
     void visitBlockStatement(BlockStatement &stmt) override
     {
         beginScope();
@@ -201,6 +207,14 @@ public:
         declare(stmt.name);
         define(stmt.name);
 
+        if (stmt.superclass != nullptr)
+        {
+            resolve(*stmt.superclass);
+
+            beginScope();
+            scopes.back()["super"] = true;
+        }
+
         beginScope();
         scopes.back()["this"] = true;
 
@@ -210,5 +224,10 @@ public:
         }
 
         endScope();
+
+        if (stmt.superclass != nullptr)
+        {
+            endScope();
+        }
     }
 };

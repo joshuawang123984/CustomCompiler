@@ -122,3 +122,36 @@ class Foo {
     init() { this.x = 1; }
 }
 print Foo();
+
+var foo = Foo();
+print foo.init();
+print foo.x;
+
+class Animal {
+    init(var name) {
+        this.name = name;
+    }
+
+    speak() {
+        print this.name + " makes a sound.";
+    }
+
+    describe() {
+        print this.name + " is an animal.";
+    }
+}
+
+class Dog < Animal {
+    speak() {
+        super.speak();
+        print this.name + " barks.";
+    }
+}
+
+var a = Animal("Generic");
+a.speak();
+print "---";
+var d = Dog("Rex");
+
+d.speak();    
+d.describe();

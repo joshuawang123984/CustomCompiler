@@ -10,11 +10,14 @@ class LoxClass : public Callable, public std::enable_shared_from_this<LoxClass>
 {
 private:
     std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods;
+    std::shared_ptr<LoxClass> superclass;
 
 public:
     std::string name;
 
-    LoxClass(std::string name, std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods) : methods(std::move(methods)), name(std::move(name)) {}
+    LoxClass(std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods, std::string name, std::shared_ptr<LoxClass> superclass)
+        : methods(std::move(methods)), superclass(std::move(superclass)), name(std::move(name)) {}
+
     std::shared_ptr<LoxFunction> findMethod(const std::string &methodName) const;
 
     Value call(Evaluator &evaluator, std::vector<Value> &arguments) override;

@@ -176,3 +176,23 @@ public:
         return visitor.visitSetExpr(*this);
     }
 };
+
+struct Super : public Expr
+{
+private:
+public:
+    Token keyword;
+    Token method;
+
+    Super(Token keyword, Token method) : keyword(std::move(keyword)), method(std::move(method)) {}
+
+    std::string accept(AstVisitor &visitor) override
+    {
+        return visitor.visitSuper(*this);
+    }
+
+    Value evaluate(EvaluatorVisitor &visitor) override
+    {
+        return visitor.visitSuperExpr(*this);
+    }
+};

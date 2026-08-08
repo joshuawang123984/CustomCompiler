@@ -58,6 +58,12 @@ public:
         return result;
     }
 
+    std::string visitSuper(Super &expr) override
+    {
+        std::string result = "superclass: " + expr.keyword.lexeme;
+        return result;
+    }
+
 private:
     std::string parenthesize(const std::string &name, std::vector<Expr *> exprs)
     {

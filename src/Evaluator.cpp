@@ -176,6 +176,36 @@ Value Evaluator::visitSetExpr(Set &expr)
     std::get<std::shared_ptr<LoxInstance>>(object)->set(expr.name.lexeme, value);
     return value;
 }
+Value Evaluator::visitSuperExpr(Super &expr)
+{
+    auto it = locals.find(&expr);
+    if (it == locals.end())
+    {
+        throw std::runtime_error("Internal error: 'super' not resolved.");
+    }
+
+    int distance = it->second;
+
+    auto superclassValue = environment->getAt(distance, "super");
+    auto superclassCallable = std::get<std::shared_ptr<Callable>>(superclassValue);
+    auto superclass = std::dynamic_pointer_cast<LoxClass>(superclassCallable);
+    if (superclass == nullptr)
+    {
+
+        throw std::runtime_error("Internal error: 'super' did not resolve to a class.");
+    }
+
+    auto instanceValue = environment->getAt(distance - 1, "this");
+    auto instance = std::get<std::shared_ptr<LoxInstance>>(instanceValue);
+
+    auto method = superclass->findMethod(expr.method.lexeme);
+    if (method == nullptr)
+    {
+        throw std::runtime_error("Undefined property '" + expr.method.lexeme + "'.");
+    }
+
+    return method->bind(instance);
+}
 void Evaluator::visitVarStatement(VarStatement &stmt)
 {
     Value val = nullptr;
@@ -267,7 +297,25 @@ void Evaluator::visitReturnStatement(ReturnStatement &stmt)
 
 void Evaluator::visitClassStatement(ClassStatement &stmt)
 {
+    std::shared_ptr<LoxClass> superclass = nullptr;
+    if (stmt.superclass != nullptr)
+    {
+        Value superclassValue = evaluate(*stmt.superclass);
+        auto callee = std::get<std::shared_ptr<Callable>>(superclassValue);
+        superclass = std::dynamic_pointer_cast<LoxClass>(callee);
+        if (superclass == nullptr)
+        {
+            throw std::runtime_error("Superclass must be a class.");
+        }
+    }
+
     environment->define(stmt.name.lexeme, nullptr);
+
+    if (stmt.superclass != nullptr)
+    {
+        environment = std::make_shared<Environment>(environment);
+        environment->define("super", superclass);
+    }
 
     std::unordered_map<std::string, std::shared_ptr<LoxFunction>> methods;
     for (const auto &methodStmt : stmt.methods)
@@ -277,6 +325,12 @@ void Evaluator::visitClassStatement(ClassStatement &stmt)
         methods[funcStmt->name.lexeme] = function;
     }
 
-    std::shared_ptr<LoxClass> klass = std::make_unique<LoxClass>(stmt.name.lexeme, methods);
-    environment->assign(stmt.name.lexeme, klass);
+    auto klass = std::make_shared<LoxClass>(methods, stmt.name.lexeme, superclass);
+
+    if (stmt.superclass != nullptr)
+    {
+        environment = environment->enclosing;
+    }
+
+    environment->define(stmt.name.lexeme, klass);
 }

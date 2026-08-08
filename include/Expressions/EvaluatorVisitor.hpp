@@ -10,6 +10,7 @@ struct Assign;
 struct Call;
 struct Get;
 struct Set;
+struct Super;
 
 struct EvaluatorVisitor
 {
@@ -23,4 +24,5 @@ struct EvaluatorVisitor
     virtual Value visitCallExpr(Call &expr) = 0;
     virtual Value visitGetExpr(Get &expr) = 0;
     virtual Value visitSetExpr(Set &expr) = 0;
+    virtual Value visitSuperExpr(Super &expr) = 0;
 };

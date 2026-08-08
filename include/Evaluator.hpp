@@ -24,6 +24,7 @@ public:
     Value visitCallExpr(Call &expr) override;
     Value visitGetExpr(Get &expr) override;
     Value visitSetExpr(Set &expr) override;
+    Value visitSuperExpr(Super &expr) override;
 
     void visitVarStatement(VarStatement &stmt) override;
     void visitPrintStatement(PrintStatement &stmt) override;

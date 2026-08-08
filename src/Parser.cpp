@@ -182,6 +182,14 @@ std::unique_ptr<Statement> Parser::returnStatement()
 std::unique_ptr<Statement> Parser::classStatement()
 {
     Token name = tokenVector.consume(TokenType::IDENTIFIER, "Expect class name");
+
+    std::unique_ptr<Expr> superclass = nullptr;
+    if (tokenVector.token_match(TokenType::LESS))
+    {
+        tokenVector.consume(TokenType::IDENTIFIER, "Expect superclass name.");
+        superclass = std::make_unique<Variable>(tokenVector.previous());
+    }
+
     tokenVector.consume(TokenType::LEFT_BRACE, "Expect '{' after class name");
 
     std::vector<std::unique_ptr<Statement>> methods;
@@ -192,7 +200,7 @@ std::unique_ptr<Statement> Parser::classStatement()
 
     tokenVector.consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
 
-    return std::make_unique<ClassStatement>(std::move(name), std::move(methods));
+    return std::make_unique<ClassStatement>(std::move(name), std::move(methods), std::move(superclass));
 }
 std::unique_ptr<Expr> Parser::expr_parse()
 {
@@ -363,6 +371,14 @@ std::unique_ptr<Expr> Parser::primary()
     if (tokenVector.token_match(TokenType::THIS))
     {
         return std::make_unique<Variable>(tokenVector.previous());
+    }
+
+    if (tokenVector.token_match(TokenType::SUPER))
+    {
+        Token keyword = tokenVector.previous();
+        tokenVector.consume(TokenType::DOT, "Expect '.' after 'super'");
+        Token method = tokenVector.consume(TokenType::IDENTIFIER, "Expect superclass method name");
+        return std::make_unique<Super>(std::move(keyword), std::move(method));
     }
 
     throw std::runtime_error("Expect expression. Failed Token: " + tokenVector.token_peek().lexeme);
