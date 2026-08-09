@@ -18,11 +18,11 @@ jobs:
   build-bytecode:
     runs-on: ubuntu-latest
     steps:
-      -name: checkout code
-      uses: actions/checkout@v4
-      -name: build
-      run: make
-      working-directory: bytecode
-      -name: run
-      run: ./compiler
-      working-directory: bytecode
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: build
+        run: make
+        working-directory: bytecode
+      - name: run
+        run: ./compiler
+        working-directory: bytecode
