@@ -1,7 +1,8 @@
+#pragma once
 #include <iostream>
 #include <vector>
 
-#include "Types.hpp"
+#include "Helper/Types.hpp"
 
 enum class OpCode : uint8_t
 {

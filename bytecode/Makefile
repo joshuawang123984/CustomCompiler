@@ -1,12 +1,16 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Iinclude -Wall
 
-SRC = $(wildcard src/*.cpp)
-OBJ = $(SRC:.cpp=.o)
-TARGET = compiler
+rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
-$(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $(TARGET)
+SRC = $(call rwildcard,src/,*.cpp)
+OBJ = $(SRC:.cpp=.o)
+
+compiler: $(OBJ)
+	$(CXX) $(OBJ) -o compiler
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f src/*.o $(TARGET)
+	rm -f $(OBJ) compiler
