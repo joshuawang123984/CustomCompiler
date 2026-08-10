@@ -19,5 +19,5 @@ private:
     InterpretResult run();
 
 public:
-    InterpretResult interpret(Chunk &chunk);
+    InterpretResult interpret(Chunk &chunkArg);
 };
