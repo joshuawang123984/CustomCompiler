@@ -1,5 +1,6 @@
 #include "Types.hpp"
 #include <iostream>
+#include <cstdint>
 
 class Chunk;
 
