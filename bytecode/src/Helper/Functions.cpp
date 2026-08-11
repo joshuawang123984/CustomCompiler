@@ -1,5 +1,6 @@
-#include "../../include/Helper/Chunk.hpp"
-#include "../../include/Helper/Functions.hpp"
+#include "../../include/Helper/chunk.hpp"
+#include "../../include/Helper/functions.hpp"
+#include "../../include/Helper/obj.hpp"
 #include <iomanip>
 
 void disassembleChunk(Chunk &chunk, const std::string &name)
@@ -45,7 +46,7 @@ int disassembleInstruction(Chunk &chunk, int offset)
     }
 }
 
-void printValue(Value val)
+void printValue(const Value &val)
 {
     switch (val.type)
     {
@@ -64,9 +65,24 @@ void printValue(Value val)
     }
 }
 
-void printObject(Value val)
+void printObject(const Value &val)
 {
-    // switch ()
-    // {
-    // }
+    switch (val.as.obj->type)
+    {
+    case ObjType::OBJ_STRING:
+        std::cout << val.asString()->chars << std::endl;
+        break;
+
+    case ObjType::OBJ_CLASS:
+        std::cout << val.asClass()->name->chars << std::endl;
+        break;
+
+    case ObjType::OBJ_INSTANCE:
+        std::cout << val.asInstance()->klass->name->chars << " instance" << std::endl;
+        break;
+
+    case ObjType::OBJ_FUNCTION:
+        std::cout << "<fn " << (val.asFunction()->name ? val.asFunction()->name->chars : "anonymous") << ">" << std::endl;
+        break;
+    }
 }

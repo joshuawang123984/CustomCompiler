@@ -1,5 +1,5 @@
-#include "../include/Helper/Functions.hpp"
-#include "../include/Helper/Chunk.hpp"
+#include "../include/Helper/functions.hpp"
+#include "../include/Helper/chunk.hpp"
 
 int main()
 {

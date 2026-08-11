@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "Helper/Types.hpp"
+#include "Helper/types.hpp"
 
 enum class OpCode : uint8_t
 {

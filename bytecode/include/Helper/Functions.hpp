@@ -6,5 +6,5 @@ struct Value;
 
 void disassembleChunk(Chunk &chunk, const std::string &name);
 int disassembleInstruction(Chunk &chunk, int offset);
-void printValue(Value val);
-void printObject(Value val);
+void printValue(const Value &val);
+void printObject(const Value &val);

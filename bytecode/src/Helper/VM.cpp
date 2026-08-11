@@ -1,5 +1,5 @@
-#include "../../include/Helper/VM.hpp"
-#include "../../include/Helper/Chunk.hpp"
+#include "../../include/Helper/vm.hpp"
+#include "../../include/Helper/chunk.hpp"
 
 InterpretResult VM::run()
 {
