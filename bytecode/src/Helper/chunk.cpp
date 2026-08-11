@@ -1,4 +1,4 @@
-#include "Helper/chunk.hpp"
+#include "../../include/Helper/chunk.hpp"
 
 void Chunk::write(uint8_t byte, int line)
 {
