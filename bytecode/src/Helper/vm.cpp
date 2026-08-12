@@ -37,6 +37,7 @@ InterpretResult VM::run()
 
             if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
             {
+                runtimeError("Operands must be numbers.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
             stack.push_back(Value(a.as.number + b.as.number));
@@ -51,6 +52,7 @@ InterpretResult VM::run()
 
             if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
             {
+                runtimeError("Operands must be numbers.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
             stack.push_back(Value(a.as.number - b.as.number));
@@ -65,6 +67,7 @@ InterpretResult VM::run()
 
             if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
             {
+                runtimeError("Operands must be numbers.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
             stack.push_back(Value(a.as.number * b.as.number));
@@ -79,6 +82,7 @@ InterpretResult VM::run()
 
             if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
             {
+                runtimeError("Operands must be numbers.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
             stack.push_back(Value(a.as.number / b.as.number));
@@ -91,6 +95,7 @@ InterpretResult VM::run()
 
             if (a.type != ValueType::VAL_NUMBER)
             {
+                runtimeError("Operands must be numbers.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
             stack.push_back(Value(a.as.number * -1));
@@ -123,6 +128,7 @@ InterpretResult VM::run()
 
             if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
             {
+                runtimeError("Operands must be numbers.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
             stack.push_back(Value(a.as.number > b.as.number));
@@ -137,6 +143,7 @@ InterpretResult VM::run()
 
             if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
             {
+                runtimeError("Operands must be numbers.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
             stack.push_back(Value(a.as.number < b.as.number));
@@ -154,4 +161,12 @@ InterpretResult VM::interpret(Chunk &chunkArg)
     chunk = &chunkArg;
     ip = chunk->code.data();
     return run();
+}
+
+void VM::runtimeError(const std::string &message)
+{
+    size_t instructionIndex = ip - chunk->code.data() - 1;
+    int line = chunk->lines[instructionIndex];
+    std::cerr << "[line " << line << "] Runtime Error: " << message << std::endl;
+    stack.clear();
 }

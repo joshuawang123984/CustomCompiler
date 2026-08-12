@@ -19,6 +19,7 @@ private:
     uint8_t *ip;
     std::vector<Value> stack;
     InterpretResult run();
+    void runtimeError(const std::string &message);
 
 public:
     InterpretResult interpret(Chunk &chunkArg);
