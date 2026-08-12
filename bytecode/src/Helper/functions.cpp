@@ -86,3 +86,21 @@ void printObject(const Value &val)
         break;
     }
 }
+
+bool valuesEqual(const Value &a, const Value &b)
+{
+    if (a.type != b.type)
+        return false;
+    switch (a.type)
+    {
+    case ValueType::VAL_NIL:
+        return true;
+    case ValueType::VAL_BOOL:
+        return a.as.boolean == b.as.boolean;
+    case ValueType::VAL_NUMBER:
+        return a.as.number == b.as.number;
+    case ValueType::VAL_OBJ:
+        return a.as.obj == b.as.obj;
+    }
+    return false;
+}

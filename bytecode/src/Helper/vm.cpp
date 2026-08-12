@@ -1,5 +1,6 @@
 #include "../../include/Helper/vm.hpp"
 #include "../../include/Helper/chunk.hpp"
+#include "../../include/Helper/functions.hpp"
 
 InterpretResult VM::run()
 {
@@ -22,28 +23,127 @@ InterpretResult VM::run()
             break;
         }
         case (uint8_t)OpCode::OP_TRUE:
+            stack.push_back(Value(true));
             break;
         case (uint8_t)OpCode::OP_FALSE:
+            stack.push_back(Value(false));
             break;
         case (uint8_t)OpCode::OP_ADD:
+        {
+            Value b = stack.back();
+            stack.pop_back();
+            Value a = stack.back();
+            stack.pop_back();
+
+            if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
+            {
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            stack.push_back(Value(a.as.number + b.as.number));
             break;
-        case (uint8_t)OpCode::OP_SUBRACT:
+        }
+        case (uint8_t)OpCode::OP_SUBTRACT:
+        {
+            Value b = stack.back();
+            stack.pop_back();
+            Value a = stack.back();
+            stack.pop_back();
+
+            if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
+            {
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            stack.push_back(Value(a.as.number - b.as.number));
             break;
+        }
         case (uint8_t)OpCode::OP_MULTIPLY:
+        {
+            Value b = stack.back();
+            stack.pop_back();
+            Value a = stack.back();
+            stack.pop_back();
+
+            if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
+            {
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            stack.push_back(Value(a.as.number * b.as.number));
             break;
+        }
         case (uint8_t)OpCode::OP_DIVIDE:
+        {
+            Value b = stack.back();
+            stack.pop_back();
+            Value a = stack.back();
+            stack.pop_back();
+
+            if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
+            {
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            stack.push_back(Value(a.as.number / b.as.number));
             break;
+        }
         case (uint8_t)OpCode::OP_NEGATE:
+        {
+            Value a = stack.back();
+            stack.pop_back();
+
+            if (a.type != ValueType::VAL_NUMBER)
+            {
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            stack.push_back(Value(a.as.number * -1));
             break;
+        }
         case (uint8_t)OpCode::OP_NOT:
+        {
+            Value a = stack.back();
+            stack.pop_back();
+            bool falsy = (a.type == ValueType::VAL_NIL) || (a.type == ValueType::VAL_BOOL && !a.as.boolean);
+            stack.push_back(Value(falsy));
             break;
+        }
         case (uint8_t)OpCode::OP_EQUAL:
+        {
+            Value b = stack.back();
+            stack.pop_back();
+            Value a = stack.back();
+            stack.pop_back();
+
+            stack.push_back(Value(valuesEqual(a, b)));
             break;
+        }
         case (uint8_t)OpCode::OP_GREATER:
+        {
+            Value b = stack.back();
+            stack.pop_back();
+            Value a = stack.back();
+            stack.pop_back();
+
+            if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
+            {
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            stack.push_back(Value(a.as.number > b.as.number));
             break;
+        }
         case (uint8_t)OpCode::OP_LESS:
+        {
+            Value b = stack.back();
+            stack.pop_back();
+            Value a = stack.back();
+            stack.pop_back();
+
+            if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
+            {
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            stack.push_back(Value(a.as.number < b.as.number));
             break;
+        }
         case (uint8_t)OpCode::OP_NIL:
+            stack.push_back(Value());
             break;
         }
     }
