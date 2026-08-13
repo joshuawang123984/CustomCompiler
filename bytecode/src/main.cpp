@@ -1,17 +1,42 @@
 #include "../include/Helper/functions.hpp"
 #include "../include/Helper/chunk.hpp"
+#include "../include/Scanner.hpp"
 
-int main()
+void test(const std::string source);
+
+int main(int argc, char *argv[])
 {
-    Chunk chunk;
 
-    int constIndex = chunk.addConstant(1.2);
-    chunk.write((uint8_t)OpCode::OP_CONSTANT, 123);
-    chunk.write((uint8_t)constIndex, 123);
+    if (argc > 2)
+    {
+        std::cout << "Usage: clox [script]" << std::endl;
+        std::exit(64);
+    }
 
-    chunk.write((uint8_t)OpCode::OP_RETURN, 123);
+    else if (argc == 2)
+    {
+        std::string source = runFile(argv[1]);
+        test(source);
+    }
 
-    disassembleChunk(chunk, "test chunk");
+    else
+    {
+        std::cout << "Usage: clox [script]" << std::endl;
+    }
 
     return 0;
+}
+
+void test(const std::string source)
+{
+    Scanner scanner(source);
+    TokenVector tokens = scanner.scanTokens();
+
+    for (const Token &token : tokens.getTokens())
+    {
+        std::cout << "[line " << token.line << "] "
+                  << static_cast<int>(token.type)
+                  << " '" << token.lexeme << "'"
+                  << std::endl;
+    }
 }

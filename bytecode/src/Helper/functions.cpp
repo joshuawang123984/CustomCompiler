@@ -1,7 +1,32 @@
 #include "../../include/Helper/chunk.hpp"
 #include "../../include/Helper/functions.hpp"
-#include "../../include/Helper/obj.hpp"
+#include "../../include/Helper/Obj.hpp"
 #include <iomanip>
+#include <fstream>
+
+std::string runFile(const std::string &path)
+{
+    std::ifstream file(path);
+    if (!file.is_open())
+    {
+        std::cerr << "Could not open file: " << path << std::endl;
+        std::exit(74);
+    }
+
+    std::string source((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    return source;
+}
+
+void printTokens(const TokenVector &tokens)
+{
+
+    for (const auto &token : tokens.getTokens())
+    {
+        std::cout
+            << " | Lexeme: " << token.lexeme
+            << " | Line: " << token.line << std::endl;
+    }
+}
 
 void disassembleChunk(Chunk &chunk, const std::string &name)
 {

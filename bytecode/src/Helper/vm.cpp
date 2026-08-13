@@ -1,4 +1,4 @@
-#include "../../include/Helper/vm.hpp"
+#include "../../include/Helper/VM.hpp"
 #include "../../include/Helper/chunk.hpp"
 #include "../../include/Helper/functions.hpp"
 

@@ -1,5 +1,5 @@
 #include "../../include/Helper/chunk.hpp"
-#include "../../include/Helper/obj.hpp"
+#include "../../include/Helper/Obj.hpp"
 
 bool Value::isString() const
 {

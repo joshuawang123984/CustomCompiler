@@ -1,5 +1,10 @@
 #pragma once
 #include <iostream>
+#include "types.hpp"
+#include "TokenVector.hpp"
+
+std::string runFile(const std::string &path);
+void printTokens(const TokenVector &tokens);
 
 class Chunk;
 struct Value;
