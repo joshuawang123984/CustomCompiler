@@ -10,9 +10,13 @@ bool TokenVector::isAtEnd() const
 {
     return *current >= static_cast<int>(source.length());
 }
+bool TokenVector::isAtTokenEnd() const
+{
+    return tokenIndex >= tokens.size();
+}
 bool TokenVector::check(TokenType type)
 {
-    if (isAtEnd())
+    if (isAtTokenEnd())
         return false;
 
     return token_peek().type == type;
@@ -43,10 +47,10 @@ char TokenVector::char_peek()
 }
 Token TokenVector::token_peek()
 {
-    if (isAtEnd())
+    if (isAtTokenEnd())
         return Token(TokenType::NIL, "null", -1);
 
-    return tokens.at(*current);
+    return tokens.at(tokenIndex);
 }
 char TokenVector::peekNext()
 {
@@ -62,15 +66,15 @@ char TokenVector::char_advance()
 }
 Token TokenVector::token_advance()
 {
-    if (isAtEnd())
+    if (isAtTokenEnd())
         return Token(TokenType::NIL, "null", -1);
-    return tokens.at((*current)++);
+    return tokens.at(tokenIndex++);
 }
 Token TokenVector::previous()
 {
-    if (isAtEnd() || *current <= 0)
+    if (isAtTokenEnd() || tokenIndex <= 0)
         return Token(TokenType::NIL, "null", -1);
-    return tokens.at((*current) - 1);
+    return tokens.at(tokenIndex - 1);
 }
 Token TokenVector::consume(TokenType type, const std::string &message)
 {

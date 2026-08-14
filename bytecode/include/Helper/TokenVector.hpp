@@ -8,12 +8,12 @@ class TokenVector
 {
 public:
     explicit TokenVector(const std::string &source, int *current, int *start);
-    explicit TokenVector(TokenVector other, const std::string &source, int *current, int *start);
 
     const std::vector<Token> &getTokens() const;
     const std::string &getSource() const;
 
     bool isAtEnd() const;
+    bool isAtTokenEnd() const;
     bool check(TokenType type);
     bool char_match(char expected);
     bool token_match(TokenType type);
@@ -33,4 +33,6 @@ private:
     const std::string &source;
     int *current;
     int *start;
+
+    size_t tokenIndex = 0;
 };

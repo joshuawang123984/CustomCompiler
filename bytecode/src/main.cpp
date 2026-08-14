@@ -1,6 +1,7 @@
 #include "../include/Helper/functions.hpp"
 #include "../include/Helper/chunk.hpp"
 #include "../include/Scanner.hpp"
+#include "../include/Compiler.hpp"
 
 void test(const std::string source);
 
@@ -27,10 +28,13 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void test(const std::string source)
+void test(const std::string &source)
 {
     Scanner scanner(source);
     TokenVector tokens = scanner.scanTokens();
+
+    // Compiler compiler(source, std::make_unique<Chunk>());
+    // compiler.compile();
 
     for (const Token &token : tokens.getTokens())
     {

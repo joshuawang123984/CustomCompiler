@@ -2,6 +2,7 @@
 #include "Helper/TokenVector.hpp"
 #include "Helper/chunk.hpp"
 #include "Helper/types.hpp"
+#include "Scanner.hpp"
 
 enum class Precedence
 {
@@ -31,6 +32,7 @@ struct ParseRule
 class Compiler
 {
 private:
+    Scanner scanner;
     TokenVector tokenVector;
     int start = 0;
     int current = 0;

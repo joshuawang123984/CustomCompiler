@@ -1,7 +1,18 @@
 #include "../include/Compiler.hpp"
 
-Compiler::Compiler(const std::string &source, Chunk &chunk) : tokenVector(source, &start, &current), chunk(chunk) {}
-bool Compiler::compile() {}
+Compiler::Compiler(const std::string &source, Chunk &chunk) : scanner(source), tokenVector(source, &start, &current), chunk(chunk) {}
+bool Compiler::compile()
+{
+    //     tokenVector = scanner.scanTokens();
+
+    advance();
+    expression();
+
+    consume(TokenType::EOF_TOKEN, "End of File.");
+    emitReturn();
+
+    return !hadError;
+}
 
 void Compiler::advance() {}
 void Compiler::consume(TokenType type, const std::string &message) {}
