@@ -3,7 +3,7 @@
 #include "../include/Scanner.hpp"
 #include "../include/Compiler.hpp"
 
-void test(const std::string source);
+void test(const std::string &source);
 
 int main(int argc, char *argv[])
 {
