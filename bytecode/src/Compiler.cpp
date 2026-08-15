@@ -1,9 +1,10 @@
 #include "../include/Compiler.hpp"
 
-Compiler::Compiler(const std::string &source, Chunk &chunk) : scanner(source), tokenVector(source, &start, &current), chunk(chunk) {}
+Compiler::Compiler(const std::string &source, Chunk &chunk) : source(source), tokenVector("", &dummyCurrent, &dummyStart), chunk(chunk) {}
 bool Compiler::compile()
 {
-    //     tokenVector = scanner.scanTokens();
+    Scanner scanner(source);
+    tokenVector = scanner.scanTokens();
 
     advance();
     expression();

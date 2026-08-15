@@ -30,7 +30,7 @@ public:
 
 private:
     std::vector<Token> tokens;
-    const std::string &source;
+    std::string source;
     int *current;
     int *start;
 

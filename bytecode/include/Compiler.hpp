@@ -32,19 +32,15 @@ struct ParseRule
 class Compiler
 {
 private:
-    Scanner scanner;
     TokenVector tokenVector;
-    int start = 0;
-    int current = 0;
-    int line = 1;
-
     Chunk &chunk;
     bool hadError = false;
     bool panicMode = false;
 
-public:
-    Compiler(const std::string &source, Chunk &chunk);
-    bool compile();
+    int dummyStart = 0;
+    int dummyCurrent = 0;
+
+    std::string source;
 
     void advance();
     void consume(TokenType type, const std::string &message);
@@ -65,4 +61,8 @@ public:
 
     void parsePrecedence(Precedence precedence);
     ParseRule *getRule(TokenType type);
+
+public:
+    Compiler(const std::string &source, Chunk &chunk);
+    bool compile();
 };
