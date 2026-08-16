@@ -33,14 +33,19 @@ void test(const std::string &source)
     Scanner scanner(source);
     TokenVector tokens = scanner.scanTokens();
 
-    // Compiler compiler(source, std::make_unique<Chunk>());
-    // compiler.compile();
-
     for (const Token &token : tokens.getTokens())
     {
         std::cout << "[line " << token.line << "] "
                   << static_cast<int>(token.type)
                   << " '" << token.lexeme << "'"
                   << std::endl;
+    }
+
+    Chunk chunk;
+    Compiler compiler(source, chunk);
+    bool ok = compiler.compile();
+    if (ok)
+    {
+        disassembleChunk(chunk, "test");
     }
 }

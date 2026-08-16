@@ -7,7 +7,6 @@ bool Compiler::compile()
     Scanner scanner(source);
     tokenVector = scanner.scanTokens();
 
-    advance();
     expression();
 
     consume(TokenType::EOF_TOKEN, "End of File.");
@@ -34,7 +33,7 @@ void Compiler::errorAt(const Token &token, const std::string &message)
 {
     if (panicMode)
         return;
-    std::cout << "[line " << token.line << "] Error: " << message << std::endl;
+    std::cout << "[line " << token.line << "] Error (TokenType " << static_cast<int>(tokenVector.previous().type) << "): " << message << std::endl;
     hadError = true;
     panicMode = true;
 }
@@ -163,6 +162,7 @@ void Compiler::emitReturn()
 void Compiler::parsePrecedence(Precedence precedence)
 {
     advance();
+
     ParseFn prefixRule = getRule(tokenVector.previous().type)->prefix;
     if (prefixRule == nullptr)
     {

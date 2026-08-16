@@ -32,6 +32,7 @@ struct ParseRule
 class Compiler
 {
 private:
+    std::string source;
     TokenVector tokenVector;
     Chunk &chunk;
     bool hadError = false;
@@ -39,8 +40,6 @@ private:
 
     int dummyStart = 0;
     int dummyCurrent = 0;
-
-    std::string source;
 
     void advance();
     void consume(TokenType type, const std::string &message);
