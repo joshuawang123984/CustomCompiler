@@ -21,6 +21,8 @@ enum class OpCode : uint8_t
     OP_GREATER,
     OP_LESS,
     OP_RETURN,
+    OP_POP,
+    OP_PRINT,
 };
 
 class Chunk

@@ -149,6 +149,16 @@ InterpretResult VM::run()
             stack.push_back(Value(a.as.number < b.as.number));
             break;
         }
+        case (uint8_t)OpCode::OP_POP:
+            stack.pop_back();
+            break;
+        case (uint8_t)OpCode::OP_PRINT:
+        {
+            Value val = stack.back();
+            stack.pop_back();
+            printValue(val);
+            break;
+        }
         case (uint8_t)OpCode::OP_NIL:
             stack.push_back(Value());
             break;

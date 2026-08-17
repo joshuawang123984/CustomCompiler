@@ -7,7 +7,10 @@ bool Compiler::compile()
     Scanner scanner(source);
     tokenVector = scanner.scanTokens();
 
-    expression();
+    while (!tokenVector.check(TokenType::EOF_TOKEN))
+    {
+        declaration();
+    }
 
     consume(TokenType::EOF_TOKEN, "End of File.");
     emitReturn();
@@ -138,6 +141,33 @@ void Compiler::literal()
     default:
         return;
     }
+}
+
+void Compiler::declaration()
+{
+    Token token = tokenVector.previous();
+    if (tokenVector.check(TokenType::PRINT))
+    {
+        emitByte((uint8_t)OpCode::OP_PRINT);
+    }
+
+    else
+    {
+        expressionStatement();
+    }
+}
+
+void Compiler::expressionStatement()
+{
+    expression();
+    consume(TokenType::SEMICOLON, "End of Line.");
+    emitByte((uint8_t)OpCode::OP_POP);
+}
+void Compiler::printStatement()
+{
+    expression();
+    consume(TokenType::SEMICOLON, "End of Line.");
+    emitByte((uint8_t)OpCode::OP_PRINT);
 }
 
 void Compiler::emitByte(uint8_t byte)

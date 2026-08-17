@@ -53,6 +53,10 @@ private:
     void binary();
     void literal();
 
+    void declaration();
+    void expressionStatement();
+    void printStatement();
+
     void emitByte(uint8_t byte);
     void emitBytes(uint8_t a, uint8_t b);
     void emitConstant(Value value);
