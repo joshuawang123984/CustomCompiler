@@ -52,10 +52,13 @@ private:
     void unary();
     void binary();
     void literal();
+    void variable();
 
     void declaration();
+    void statement();
     void expressionStatement();
     void printStatement();
+    void varDeclaration();
 
     void emitByte(uint8_t byte);
     void emitBytes(uint8_t a, uint8_t b);

@@ -1,6 +1,7 @@
 #include "../../include/Helper/VM.hpp"
 #include "../../include/Helper/chunk.hpp"
 #include "../../include/Helper/functions.hpp"
+#include "../../include/Helper/Obj.hpp"
 
 InterpretResult VM::run()
 {
@@ -157,6 +158,42 @@ InterpretResult VM::run()
             Value val = stack.back();
             stack.pop_back();
             printValue(val);
+            break;
+        }
+        case (uint8_t)OpCode::OP_DEFINE_GLOBAL:
+        {
+            uint8_t nameIndex = *ip;
+            ip++;
+            ObjString *name = chunk->constants[nameIndex].asString();
+            globals[name->chars] = stack.back();
+            stack.pop_back();
+            break;
+        }
+        case (uint8_t)OpCode::OP_GET_GLOBAL:
+        {
+            uint8_t nameIndex = *ip;
+            ip++;
+            ObjString *name = chunk->constants[nameIndex].asString();
+            auto it = globals.find(name->chars);
+            if (it == globals.end())
+            {
+                runtimeError("Undefined variable '" + name->chars + "'.");
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            stack.push_back(it->second);
+            break;
+        }
+        case (uint8_t)OpCode::OP_SET_GLOBAL:
+        {
+            uint8_t nameIndex = *ip;
+            ip++;
+            ObjString *name = chunk->constants[nameIndex].asString();
+            if (globals.find(name->chars) == globals.end())
+            {
+                runtimeError("Undefined variable '" + name->chars + "'.");
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            globals[name->chars] = stack.back();
             break;
         }
         case (uint8_t)OpCode::OP_NIL:

@@ -12,7 +12,6 @@ bool Compiler::compile()
         declaration();
     }
 
-    consume(TokenType::EOF_TOKEN, "End of File.");
     emitReturn();
 
     return !hadError;
@@ -143,12 +142,35 @@ void Compiler::literal()
     }
 }
 
+void Compiler::variable()
+{
+    Token identifier = tokenVector.previous();
+    ObjString *nameObj = new ObjString(identifier.lexeme);
+    int nameConstant = chunk.addConstant(Value(nameObj));
+    emitBytes((uint8_t)OpCode::OP_GET_GLOBAL, (uint8_t)nameConstant);
+}
+
 void Compiler::declaration()
+{
+    Token token = tokenVector.previous();
+    if (tokenVector.check(TokenType::VAR))
+    {
+        advance();
+        varDeclaration();
+    }
+    else
+    {
+        statement();
+    }
+}
+
+void Compiler::statement()
 {
     Token token = tokenVector.previous();
     if (tokenVector.check(TokenType::PRINT))
     {
-        emitByte((uint8_t)OpCode::OP_PRINT);
+        advance();
+        printStatement();
     }
 
     else
@@ -168,6 +190,27 @@ void Compiler::printStatement()
     expression();
     consume(TokenType::SEMICOLON, "End of Line.");
     emitByte((uint8_t)OpCode::OP_PRINT);
+}
+
+void Compiler::varDeclaration()
+{
+    consume(TokenType::IDENTIFIER, "Expect identifier after 'var'.");
+    Token token = tokenVector.previous();
+    ObjString *nameObj = new ObjString(token.lexeme);
+    int nameConstant = chunk.addConstant(Value(nameObj));
+
+    if (tokenVector.check(TokenType::EQUAL))
+    {
+        advance();
+        expression();
+    }
+    else
+    {
+        emitByte((uint8_t)OpCode::OP_NIL);
+    }
+
+    consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
+    emitBytes((uint8_t)OpCode::OP_DEFINE_GLOBAL, (uint8_t)nameConstant);
 }
 
 void Compiler::emitByte(uint8_t byte)
@@ -234,7 +277,7 @@ ParseRule *Compiler::getRule(TokenType type)
             {TokenType::LESS, {nullptr, &Compiler::binary, Precedence::COMPARISON}},
             {TokenType::LESS_EQUAL, {nullptr, &Compiler::binary, Precedence::COMPARISON}},
 
-            {TokenType::IDENTIFIER, {nullptr, nullptr, Precedence::NONE}},
+            {TokenType::IDENTIFIER, {&Compiler::variable, nullptr, Precedence::NONE}},
             {TokenType::STRING, {&Compiler::string, nullptr, Precedence::NONE}},
             {TokenType::NUMBER, {&Compiler::number, nullptr, Precedence::NONE}},
 

@@ -28,6 +28,21 @@ void printTokens(const TokenVector &tokens)
     }
 }
 
+int simpleInstruction(const std::string &name, int offset)
+{
+    std::cout << name << std::endl;
+    return offset + 1;
+}
+
+int constantInstruction(const std::string &name, Chunk &chunk, int offset)
+{
+    uint8_t constIndex = chunk.code[offset + 1];
+    std::cout << name << "  " << (int)constIndex << " '";
+    printValue(chunk.constants[constIndex]);
+    std::cout << "'" << std::endl;
+    return offset + 2;
+}
+
 void disassembleChunk(Chunk &chunk, const std::string &name)
 {
     std::cout << "== " << name << " ==" << std::endl;
@@ -53,17 +68,48 @@ int disassembleInstruction(Chunk &chunk, int offset)
     switch (instruction)
     {
     case (uint8_t)OpCode::OP_RETURN:
-        std::cout << "OP_RETURN" << std::endl;
-        return offset + 1;
-
+        return simpleInstruction("OP_RETURN", offset);
     case (uint8_t)OpCode::OP_CONSTANT:
-    {
-        uint8_t constIndex = chunk.code[offset + 1];
-        std::cout << "OP_CONSTANT  " << (int)constIndex << " '";
-        printValue(chunk.constants[constIndex]);
-        std::cout << "'" << std::endl;
-        return offset + 2;
-    }
+        return constantInstruction("OP_CONSTANT", chunk, offset);
+
+    case (uint8_t)OpCode::OP_NIL:
+        return simpleInstruction("OP_NIL", offset);
+    case (uint8_t)OpCode::OP_TRUE:
+        return simpleInstruction("OP_TRUE", offset);
+    case (uint8_t)OpCode::OP_FALSE:
+        return simpleInstruction("OP_FALSE", offset);
+
+    case (uint8_t)OpCode::OP_ADD:
+        return simpleInstruction("OP_ADD", offset);
+    case (uint8_t)OpCode::OP_SUBTRACT:
+        return simpleInstruction("OP_SUBTRACT", offset);
+    case (uint8_t)OpCode::OP_MULTIPLY:
+        return simpleInstruction("OP_MULTIPLY", offset);
+    case (uint8_t)OpCode::OP_DIVIDE:
+        return simpleInstruction("OP_DIVIDE", offset);
+    case (uint8_t)OpCode::OP_NEGATE:
+        return simpleInstruction("OP_NEGATE", offset);
+    case (uint8_t)OpCode::OP_NOT:
+        return simpleInstruction("OP_NOT", offset);
+
+    case (uint8_t)OpCode::OP_EQUAL:
+        return simpleInstruction("OP_EQUAL", offset);
+    case (uint8_t)OpCode::OP_GREATER:
+        return simpleInstruction("OP_GREATER", offset);
+    case (uint8_t)OpCode::OP_LESS:
+        return simpleInstruction("OP_LESS", offset);
+
+    case (uint8_t)OpCode::OP_POP:
+        return simpleInstruction("OP_POP", offset);
+    case (uint8_t)OpCode::OP_PRINT:
+        return simpleInstruction("OP_PRINT", offset);
+
+    case (uint8_t)OpCode::OP_DEFINE_GLOBAL:
+        return constantInstruction("OP_DEFINE_GLOBAL", chunk, offset);
+    case (uint8_t)OpCode::OP_GET_GLOBAL:
+        return constantInstruction("OP_GET_GLOBAL", chunk, offset);
+    case (uint8_t)OpCode::OP_SET_GLOBAL:
+        return constantInstruction("OP_SET_GLOBAL", chunk, offset);
 
     default:
         std::cout << "Unknown opcode " << (int)instruction << std::endl;

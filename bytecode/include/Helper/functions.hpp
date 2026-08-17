@@ -9,6 +9,9 @@ void printTokens(const TokenVector &tokens);
 class Chunk;
 struct Value;
 
+int simpleInstruction(const std::string &name, int offset);
+int constantInstruction(const std::string &name, Chunk &chunk, int offset);
+
 void disassembleChunk(Chunk &chunk, const std::string &name);
 int disassembleInstruction(Chunk &chunk, int offset);
 void printValue(const Value &val);

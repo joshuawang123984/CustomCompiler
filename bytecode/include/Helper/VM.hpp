@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdint>
 #include <vector>
+#include <unordered_map>
 
 class Chunk;
 
@@ -18,6 +19,8 @@ private:
     Chunk *chunk;
     uint8_t *ip;
     std::vector<Value> stack;
+    std::unordered_map<std::string, Value> globals;
+
     InterpretResult run();
     void runtimeError(const std::string &message);
 
