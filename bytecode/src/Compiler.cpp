@@ -145,6 +145,16 @@ void Compiler::literal()
 void Compiler::variable()
 {
     Token identifier = tokenVector.previous();
+
+    for (int i = locals.size() - 1; i >= 0; --i)
+    {
+        if (locals[i].name.lexeme == identifier.lexeme)
+        {
+            emitBytes((uint8_t)OpCode::OP_GET_LOCAL, (uint8_t)i);
+            return;
+        }
+    }
+
     ObjString *nameObj = new ObjString(identifier.lexeme);
     int nameConstant = chunk.addConstant(Value(nameObj));
     emitBytes((uint8_t)OpCode::OP_GET_GLOBAL, (uint8_t)nameConstant);
@@ -173,6 +183,12 @@ void Compiler::statement()
         printStatement();
     }
 
+    else if (tokenVector.check(TokenType::LEFT_BRACE))
+    {
+        advance();
+        block();
+    }
+
     else
     {
         expressionStatement();
@@ -182,14 +198,25 @@ void Compiler::statement()
 void Compiler::expressionStatement()
 {
     expression();
-    consume(TokenType::SEMICOLON, "End of Line.");
+    consume(TokenType::SEMICOLON, "End of Line (expression statement).");
     emitByte((uint8_t)OpCode::OP_POP);
 }
 void Compiler::printStatement()
 {
     expression();
-    consume(TokenType::SEMICOLON, "End of Line.");
+    consume(TokenType::SEMICOLON, "End of Line (print statement.");
     emitByte((uint8_t)OpCode::OP_PRINT);
+}
+
+void Compiler::block()
+{
+    beginScope();
+    while (!tokenVector.check(TokenType::RIGHT_BRACE) && !tokenVector.check(TokenType::EOF_TOKEN))
+    {
+        declaration();
+    }
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
+    endScope();
 }
 
 void Compiler::varDeclaration()
@@ -210,7 +237,14 @@ void Compiler::varDeclaration()
     }
 
     consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
-    emitBytes((uint8_t)OpCode::OP_DEFINE_GLOBAL, (uint8_t)nameConstant);
+
+    if (scopeDepth == 0)
+    {
+        emitBytes((uint8_t)OpCode::OP_DEFINE_GLOBAL, (uint8_t)nameConstant);
+        return;
+    }
+
+    locals.push_back({token, scopeDepth});
 }
 
 void Compiler::emitByte(uint8_t byte)
@@ -296,4 +330,19 @@ ParseRule *Compiler::getRule(TokenType type)
     if (it == rules.end())
         return &emptyRule;
     return &it->second;
+}
+
+void Compiler::beginScope()
+{
+    scopeDepth++;
+}
+void Compiler::endScope()
+{
+    scopeDepth--;
+
+    while (!locals.empty() && locals.back().depth > scopeDepth)
+    {
+        emitByte((uint8_t)OpCode::OP_POP);
+        locals.pop_back();
+    }
 }

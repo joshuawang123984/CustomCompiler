@@ -110,6 +110,10 @@ int disassembleInstruction(Chunk &chunk, int offset)
         return constantInstruction("OP_GET_GLOBAL", chunk, offset);
     case (uint8_t)OpCode::OP_SET_GLOBAL:
         return constantInstruction("OP_SET_GLOBAL", chunk, offset);
+    case (uint8_t)OpCode::OP_GET_LOCAL:
+        return constantInstruction("OP_GET_LOCAL", chunk, offset);
+    case (uint8_t)OpCode::OP_SET_LOCAL:
+        return constantInstruction("OP_SET_LOCAL", chunk, offset);
 
     default:
         std::cout << "Unknown opcode " << (int)instruction << std::endl;

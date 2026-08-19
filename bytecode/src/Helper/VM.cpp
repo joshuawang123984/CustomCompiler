@@ -196,6 +196,20 @@ InterpretResult VM::run()
             globals[name->chars] = stack.back();
             break;
         }
+        case (uint8_t)OpCode::OP_SET_LOCAL:
+        {
+            uint8_t nameIndex = *ip;
+            ip++;
+            stack[nameIndex] = stack.back();
+            break;
+        }
+        case (uint8_t)OpCode::OP_GET_LOCAL:
+        {
+            uint8_t nameIndex = *ip;
+            ip++;
+            stack.push_back(stack[nameIndex]);
+            break;
+        }
         case (uint8_t)OpCode::OP_NIL:
             stack.push_back(Value());
             break;

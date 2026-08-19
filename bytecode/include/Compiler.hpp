@@ -29,6 +29,13 @@ struct ParseRule
     ParseFn infix;
     Precedence precedence;
 };
+
+struct Local
+{
+    Token name;
+    int depth;
+};
+
 class Compiler
 {
 private:
@@ -40,6 +47,9 @@ private:
 
     int dummyStart = 0;
     int dummyCurrent = 0;
+
+    int scopeDepth = 0;
+    std::vector<Local> locals;
 
     void advance();
     void consume(TokenType type, const std::string &message);
@@ -58,6 +68,7 @@ private:
     void statement();
     void expressionStatement();
     void printStatement();
+    void block();
     void varDeclaration();
 
     void emitByte(uint8_t byte);
@@ -67,6 +78,9 @@ private:
 
     void parsePrecedence(Precedence precedence);
     ParseRule *getRule(TokenType type);
+
+    void beginScope();
+    void endScope();
 
 public:
     Compiler(const std::string &source, Chunk &chunk);
