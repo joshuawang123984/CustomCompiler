@@ -24,8 +24,11 @@ bool TokenVector::char_match(char expected)
 {
     if (isAtEnd())
         return false;
+    if (source[*current] != expected)
+        return false;
 
-    return source[*current] == expected;
+    (*current)++;
+    return true;
 }
 bool TokenVector::token_match(TokenType type)
 {

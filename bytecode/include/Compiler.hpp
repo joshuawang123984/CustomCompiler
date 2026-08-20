@@ -68,6 +68,8 @@ private:
     void statement();
     void expressionStatement();
     void printStatement();
+    void ifStatement();
+    void whileStatement();
     void block();
     void varDeclaration();
 
@@ -75,6 +77,9 @@ private:
     void emitBytes(uint8_t a, uint8_t b);
     void emitConstant(Value value);
     void emitReturn();
+    uint8_t emitJump(uint8_t opcode);
+    void patchJump(int offset);
+    void emitLoop(int loopStart);
 
     void parsePrecedence(Precedence precedence);
     ParseRule *getRule(TokenType type);

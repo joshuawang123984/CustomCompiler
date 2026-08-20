@@ -189,6 +189,17 @@ void Compiler::statement()
         block();
     }
 
+    else if (tokenVector.check(TokenType::IF))
+    {
+        advance();
+        ifStatement();
+    }
+
+    else if (tokenVector.check(TokenType::WHILE))
+    {
+        advance();
+        whileStatement();
+    }
     else
     {
         expressionStatement();
@@ -207,7 +218,44 @@ void Compiler::printStatement()
     consume(TokenType::SEMICOLON, "End of Line (print statement.");
     emitByte((uint8_t)OpCode::OP_PRINT);
 }
+void Compiler::ifStatement()
+{
+    consume(TokenType::LEFT_PAREN, "Expect '(' after if");
+    expression();
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after if");
 
+    int thenJump = emitJump((uint8_t)OpCode::OP_JUMP_IF_FALSE);
+    emitByte((uint8_t)OpCode::OP_POP);
+    statement();
+
+    int elseJump = emitJump((uint8_t)OpCode::OP_JUMP);
+    patchJump(thenJump);
+
+    emitByte((uint8_t)OpCode::OP_POP);
+
+    if (tokenVector.check(TokenType::ELSE))
+    {
+        advance();
+        statement();
+    }
+
+    patchJump(elseJump);
+}
+void Compiler::whileStatement()
+{
+    int loopStart = chunk.code.size();
+    consume(TokenType::LEFT_PAREN, "Expect '(' after while");
+    expression();
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after condition");
+
+    int exitJump = emitJump((uint8_t)OpCode::OP_JUMP_IF_FALSE);
+    emitByte((uint8_t)OpCode::OP_POP);
+    statement();
+    emitLoop(loopStart);
+
+    patchJump(exitJump);
+    emitByte((uint8_t)OpCode::OP_POP);
+}
 void Compiler::block()
 {
     beginScope();
@@ -264,6 +312,36 @@ void Compiler::emitConstant(Value value)
 void Compiler::emitReturn()
 {
     emitByte((uint8_t)OpCode::OP_RETURN);
+}
+
+uint8_t Compiler::emitJump(uint8_t opcode)
+{
+    emitByte((uint8_t)opcode);
+    emitBytes(0xFF, 0xFF);
+    return chunk.code.size() - 2;
+}
+void Compiler::patchJump(int offset)
+{
+    int jump = chunk.code.size() - offset - 2;
+    if (jump > 0xFFFF)
+    {
+        errorAt(tokenVector.previous(), "Too much to jump over.");
+    }
+
+    chunk.code[offset] = (jump >> 8) & 0xFF;
+    chunk.code[offset + 1] = jump & 0xFF;
+}
+void Compiler::emitLoop(int loopStart)
+{
+    emitByte((uint8_t)OpCode::OP_LOOP);
+
+    int offset = chunk.code.size() - loopStart + 2;
+
+    if (offset > 0xFFFF)
+        errorAt(tokenVector.previous(), "Loop body too large.");
+
+    emitByte((offset >> 8) & 0xFF);
+    emitByte(offset & 0xFF);
 }
 
 void Compiler::parsePrecedence(Precedence precedence)

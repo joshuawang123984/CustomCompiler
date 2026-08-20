@@ -210,6 +210,32 @@ InterpretResult VM::run()
             stack.push_back(stack[nameIndex]);
             break;
         }
+        case (uint8_t)OpCode::OP_JUMP:
+        {
+            uint16_t offset = (ip[0] << 8) | ip[1];
+            ip += 2;
+            ip += offset;
+            break;
+        }
+        case (uint8_t)OpCode::OP_JUMP_IF_FALSE:
+        {
+            uint16_t offset = (ip[0] << 8) | ip[1];
+            ip += 2;
+            Value condition = stack.back();
+            bool falsy = (condition.type == ValueType::VAL_NIL) || (condition.type == ValueType::VAL_BOOL && !condition.as.boolean);
+            if (falsy)
+            {
+                ip += offset;
+            }
+            break;
+        }
+        case (uint8_t)OpCode::OP_LOOP:
+        {
+            uint16_t offset = (ip[0] << 8) | ip[1];
+            ip += 2;
+            ip -= offset;
+            break;
+        }
         case (uint8_t)OpCode::OP_NIL:
             stack.push_back(Value());
             break;

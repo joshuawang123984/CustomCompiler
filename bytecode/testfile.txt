@@ -11,3 +11,16 @@ print x;
     var y = 7;
     print y;
 }
+
+if (x == 6)
+{
+    print 5;
+} 
+else {
+    print 6;
+}
+
+while (x < 10){
+    print x;
+    x = x + 1;
+}
