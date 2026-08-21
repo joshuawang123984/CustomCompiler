@@ -43,6 +43,13 @@ int constantInstruction(const std::string &name, Chunk &chunk, int offset)
     return offset + 2;
 }
 
+int byteInstruction(const std::string &name, Chunk &chunk, int offset)
+{
+    uint8_t slot = chunk.code[offset + 1];
+    std::cout << name << "  " << (int)slot << std::endl;
+    return offset + 2;
+}
+
 void disassembleChunk(Chunk &chunk, const std::string &name)
 {
     std::cout << "== " << name << " ==" << std::endl;
@@ -111,9 +118,15 @@ int disassembleInstruction(Chunk &chunk, int offset)
     case (uint8_t)OpCode::OP_SET_GLOBAL:
         return constantInstruction("OP_SET_GLOBAL", chunk, offset);
     case (uint8_t)OpCode::OP_GET_LOCAL:
-        return constantInstruction("OP_GET_LOCAL", chunk, offset);
+        return byteInstruction("OP_GET_LOCAL", chunk, offset);
     case (uint8_t)OpCode::OP_SET_LOCAL:
-        return constantInstruction("OP_SET_LOCAL", chunk, offset);
+        return byteInstruction("OP_SET_LOCAL", chunk, offset);
+    case (uint8_t)OpCode::OP_JUMP:
+        return jumpInstruction("OP_JUMP", 1, chunk, offset);
+    case (uint8_t)OpCode::OP_JUMP_IF_FALSE:
+        return jumpInstruction("OP_JUMP_IF_FALSE", 1, chunk, offset);
+    case (uint8_t)OpCode::OP_LOOP:
+        return jumpInstruction("OP_LOOP", -1, chunk, offset);
 
     default:
         std::cout << "Unknown opcode " << (int)instruction << std::endl;
@@ -178,4 +191,12 @@ bool valuesEqual(const Value &a, const Value &b)
         return a.as.obj == b.as.obj;
     }
     return false;
+}
+
+int jumpInstruction(const std::string &name, int sign, Chunk &chunk, int offset)
+{
+    uint16_t jump = (uint16_t)(chunk.code[offset + 1] << 8);
+    jump |= chunk.code[offset + 2];
+    std::cout << name << "  " << offset << " -> " << (offset + 3 + sign * jump) << std::endl;
+    return offset + 3;
 }

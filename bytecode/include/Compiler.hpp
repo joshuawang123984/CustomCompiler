@@ -21,7 +21,7 @@ enum class Precedence
 
 class Compiler;
 
-typedef void (Compiler::*ParseFn)();
+typedef void (Compiler::*ParseFn)(bool canAssign);
 
 struct ParseRule
 {
@@ -56,13 +56,13 @@ private:
     void errorAt(const Token &token, const std::string &message);
 
     void expression();
-    void number();
-    void string();
-    void grouping();
-    void unary();
-    void binary();
-    void literal();
-    void variable();
+    void number(bool canAssign);
+    void string(bool canAssign);
+    void grouping(bool canAssign);
+    void unary(bool canAssign);
+    void binary(bool canAssign);
+    void literal(bool canAssign);
+    void variable(bool canAssign);
 
     void declaration();
     void statement();

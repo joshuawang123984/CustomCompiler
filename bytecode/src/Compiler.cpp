@@ -44,13 +44,13 @@ void Compiler::expression()
 {
     parsePrecedence(Precedence::ASSIGNMENT);
 }
-void Compiler::number()
+void Compiler::number(bool canAssign)
 {
     Token token = tokenVector.previous();
     double value = std::stod(token.lexeme);
     emitConstant(Value(value));
 }
-void Compiler::string()
+void Compiler::string(bool canAssign)
 {
     Token token = tokenVector.previous();
     std::string str = token.lexeme;
@@ -58,12 +58,12 @@ void Compiler::string()
     ObjString *obj = new ObjString(std::move(str));
     emitConstant(Value(obj));
 }
-void Compiler::grouping()
+void Compiler::grouping(bool canAssign)
 {
     expression();
     consume(TokenType::RIGHT_PAREN, "')' after expression");
 }
-void Compiler::unary()
+void Compiler::unary(bool canAssign)
 {
     Token operatorToken = tokenVector.previous();
     parsePrecedence(Precedence::UNARY);
@@ -80,7 +80,7 @@ void Compiler::unary()
         return;
     }
 }
-void Compiler::binary()
+void Compiler::binary(bool canAssign)
 {
     TokenType operatorType = tokenVector.previous().type;
     ParseRule *rule = getRule(operatorType);
@@ -122,7 +122,7 @@ void Compiler::binary()
         return;
     }
 }
-void Compiler::literal()
+void Compiler::literal(bool canAssign)
 {
     Token token = tokenVector.previous();
 
@@ -142,17 +142,40 @@ void Compiler::literal()
     }
 }
 
-void Compiler::variable()
+void Compiler::variable(bool canAssign)
 {
     Token identifier = tokenVector.previous();
 
+    int slot = -1;
     for (int i = locals.size() - 1; i >= 0; --i)
     {
         if (locals[i].name.lexeme == identifier.lexeme)
         {
-            emitBytes((uint8_t)OpCode::OP_GET_LOCAL, (uint8_t)i);
-            return;
+            slot = i;
+            break;
         }
+    }
+
+    if (canAssign && tokenVector.check(TokenType::EQUAL))
+    {
+        advance();
+        expression();
+
+        if (slot != -1)
+            emitBytes((uint8_t)OpCode::OP_SET_LOCAL, (uint8_t)slot);
+        else
+        {
+            ObjString *nameObj = new ObjString(identifier.lexeme);
+            int nameConstant = chunk.addConstant(Value(nameObj));
+            emitBytes((uint8_t)OpCode::OP_SET_GLOBAL, (uint8_t)nameConstant);
+        }
+        return;
+    }
+
+    if (slot != -1)
+    {
+        emitBytes((uint8_t)OpCode::OP_GET_LOCAL, (uint8_t)slot);
+        return;
     }
 
     ObjString *nameObj = new ObjString(identifier.lexeme);
@@ -354,13 +377,14 @@ void Compiler::parsePrecedence(Precedence precedence)
         errorAt(tokenVector.previous(), "Expect expression.");
         return;
     }
-    (this->*prefixRule)();
+    bool canAssign = precedence <= Precedence::ASSIGNMENT;
+    (this->*prefixRule)(canAssign);
 
     while (precedence <= getRule(tokenVector.token_peek().type)->precedence)
     {
         advance();
         ParseFn infixRule = getRule(tokenVector.previous().type)->infix;
-        (this->*infixRule)();
+        (this->*infixRule)(canAssign);
     }
 }
 

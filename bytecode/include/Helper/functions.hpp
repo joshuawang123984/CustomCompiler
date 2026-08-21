@@ -14,6 +14,9 @@ int constantInstruction(const std::string &name, Chunk &chunk, int offset);
 
 void disassembleChunk(Chunk &chunk, const std::string &name);
 int disassembleInstruction(Chunk &chunk, int offset);
+int byteInstruction(const std::string &name, Chunk &chunk, int offset);
 void printValue(const Value &val);
 void printObject(const Value &val);
 bool valuesEqual(const Value &a, const Value &b);
+
+int jumpInstruction(const std::string &name, int sign, Chunk &chunk, int offset);
