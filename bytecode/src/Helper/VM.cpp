@@ -3,21 +3,56 @@
 #include "../../include/Helper/functions.hpp"
 #include "../../include/Helper/Obj.hpp"
 
-ObjString *VM::copyString(const char *chars, int length)
-{
-    uint32_t hash = hashString(chars, length);
+static ObjString *TOMBSTONE = reinterpret_cast<ObjString *>(0x1);
 
-    ObjString *interned = tableFindString(&strings, chars, length, hash);
+static uint32_t hashString(const std::string &str)
+{
+    uint32_t hash = 2166136261u;
+    for (char c : str)
+    {
+        hash ^= (uint8_t)c;
+        hash *= 16777619;
+    }
+    return hash;
+}
+
+static ObjString *tableFindString(Table *table, const std::string &text, uint32_t hash)
+{
+    if (table->capacity == 0)
+        return nullptr;
+
+    uint32_t index = hash % table->capacity;
+
+    for (;;)
+    {
+        Entry *entry = &table->entries[index];
+
+        if (entry->key == nullptr)
+        {
+            if (entry->key != TOMBSTONE)
+                return nullptr;
+        }
+        else if (entry->key->hash == hash && entry->key->chars == text)
+        {
+            return entry->key;
+        }
+
+        index = (index + 1) % table->capacity;
+    }
+}
+
+ObjString *VM::copyString(const std::string &text)
+{
+    uint32_t hash = hashString(text);
+
+    ObjString *interned = tableFindString(&strings, text, hash);
     if (interned != nullptr)
     {
         return interned;
     }
 
-    char *heapChars = new char[length + 1];
-    memcpy(heapChars, chars, length);
-    heapChars[length] = '\0';
-
-    ObjString *string = new ObjString(heapChars, length);
+    ObjString *string = new ObjString(text);
+    string->hash = hash;
     tableSet(&strings, string, Value{});
 
     return string;
@@ -207,6 +242,7 @@ InterpretResult VM::run()
         {
             uint8_t nameIndex = *ip;
             ip++;
+            ObjString *name = chunk->constants[nameIndex].asString();
 
             if (tableSet(&globals, name, stack.back()))
             {

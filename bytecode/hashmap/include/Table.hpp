@@ -1,5 +1,6 @@
 #pragma once
 #include "../../include/Helper/types.hpp"
+#include "../../include/Helper/Obj.hpp"
 
 struct Entry
 {
@@ -12,21 +13,6 @@ struct Table
     int count;
     int capacity;
     Entry *entries;
-};
-
-struct Obj
-{
-    virtual ~Obj() = default;
-    Obj *next = nullptr;
-};
-
-struct ObjString : public Obj
-{
-    int length;
-    uint32_t hash;
-    char *chars;
-
-    ObjString(char *chars, int length);
 };
 
 void adjustCapacity(Table *table, int &capacity);

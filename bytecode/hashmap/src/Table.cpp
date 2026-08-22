@@ -35,21 +35,6 @@ static Entry *findEntry(Entry *entries, int capacity, ObjString *key)
     }
 }
 
-static uint32_t hashString(const char *key, int length)
-{
-    uint32_t hash = 2166136261u;
-    for (int i = 0; i < length; i++)
-    {
-        hash ^= (uint8_t)key[i];
-        hash *= 16777619;
-    }
-    return hash;
-}
-
-int GROW_CAPACITY(int &capacity)
-{
-}
-
 void adjustCapacity(Table *table, int &capacity)
 {
     Entry *entries = ALLOCATE<Entry>(capacity);
@@ -75,13 +60,6 @@ void adjustCapacity(Table *table, int &capacity)
     FREE_ARRAY<Entry>(table->entries, table->capacity);
     table->entries = entries;
     table->capacity = capacity;
-}
-
-ObjString::ObjString(char *chars, int length)
-{
-    this->length = length;
-    this->chars = chars;
-    this->hash = hashString(chars, length);
 }
 
 void initTable(Table *table)

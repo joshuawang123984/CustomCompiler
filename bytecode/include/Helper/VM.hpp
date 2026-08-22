@@ -20,12 +20,11 @@ private:
     Chunk *chunk;
     uint8_t *ip;
     std::vector<Value> stack;
-    // std::unordered_map<std::string, Value> globals;
 
     Table globals;
     Table strings;
 
-    ObjString *copyString(const char *chars, int length);
+    ObjString *copyString(const std::string &text);
     InterpretResult run();
     void runtimeError(const std::string &message);
 

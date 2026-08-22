@@ -4,9 +4,29 @@
 #define TABLE_MAX_LOAD 0.75
 
 template <typename T>
-void FREE_ARRAY(T *&entries, int &capacity);
+void FREE_ARRAY(T *&entries, int &capacity)
+{
+    if (entries == nullptr)
+        // maybe throw an error or smth in the future
+        return;
+
+    delete[] entries;
+    entries = nullptr;
+    capacity = 0;
+}
 
 template <typename T>
-T *ALLOCATE(int capacity);
+T *ALLOCATE(int capacity)
+{
+    if (capacity == 0)
+        return nullptr;
 
-int GROW_CAPACITY(int &capacity);
+    T *array = new T[capacity];
+
+    return array;
+}
+
+int GROW_CAPACITY(int &capacity)
+{
+    return capacity < 8 ? 8 : capacity * 2;
+}

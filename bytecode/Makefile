@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++17 -Iinclude -Wall
 
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
-SRC = $(call rwildcard,src/,*.cpp)
+SRC = $(call rwildcard,src/,*.cpp) $(call rwildcard,hashmap/,*.cpp)
 OBJ = $(SRC:.cpp=.o)
 
 compiler: $(OBJ)
