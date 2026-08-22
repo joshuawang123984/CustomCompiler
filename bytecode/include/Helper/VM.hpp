@@ -20,13 +20,27 @@ private:
     Chunk *chunk;
     uint8_t *ip;
     std::vector<Value> stack;
-    std::unordered_map<std::string, Value> globals;
+    // std::unordered_map<std::string, Value> globals;
 
-    // Table globals;
+    Table globals;
+    Table strings;
 
+    ObjString *copyString(const char *chars, int length);
     InterpretResult run();
     void runtimeError(const std::string &message);
 
 public:
     InterpretResult interpret(Chunk &chunkArg);
+
+    VM()
+    {
+        initTable(&globals);
+        initTable(&strings);
+    }
+
+    ~VM()
+    {
+        freeTable(&globals);
+        freeTable(&strings);
+    }
 };

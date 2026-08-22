@@ -3,6 +3,26 @@
 #include "../../include/Helper/functions.hpp"
 #include "../../include/Helper/Obj.hpp"
 
+ObjString *VM::copyString(const char *chars, int length)
+{
+    uint32_t hash = hashString(chars, length);
+
+    ObjString *interned = tableFindString(&strings, chars, length, hash);
+    if (interned != nullptr)
+    {
+        return interned;
+    }
+
+    char *heapChars = new char[length + 1];
+    memcpy(heapChars, chars, length);
+    heapChars[length] = '\0';
+
+    ObjString *string = new ObjString(heapChars, length);
+    tableSet(&strings, string, Value{});
+
+    return string;
+}
+
 InterpretResult VM::run()
 {
     while (true)
@@ -165,7 +185,7 @@ InterpretResult VM::run()
             uint8_t nameIndex = *ip;
             ip++;
             ObjString *name = chunk->constants[nameIndex].asString();
-            globals[name->chars] = stack.back();
+            tableSet(&globals, name, stack.back());
             stack.pop_back();
             break;
         }
@@ -174,26 +194,27 @@ InterpretResult VM::run()
             uint8_t nameIndex = *ip;
             ip++;
             ObjString *name = chunk->constants[nameIndex].asString();
-            auto it = globals.find(name->chars);
-            if (it == globals.end())
+            Value value;
+            if (!tableGet(&globals, name, &value))
             {
                 runtimeError("Undefined variable '" + name->chars + "'.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
-            stack.push_back(it->second);
+            stack.push_back(value);
             break;
         }
         case (uint8_t)OpCode::OP_SET_GLOBAL:
         {
             uint8_t nameIndex = *ip;
             ip++;
-            ObjString *name = chunk->constants[nameIndex].asString();
-            if (globals.find(name->chars) == globals.end())
+
+            if (tableSet(&globals, name, stack.back()))
             {
+                tableDelete(&globals, name);
                 runtimeError("Undefined variable '" + name->chars + "'.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
-            globals[name->chars] = stack.back();
+
             break;
         }
         case (uint8_t)OpCode::OP_SET_LOCAL:
