@@ -1,6 +1,7 @@
 #pragma once
 #include "../../include/Helper/types.hpp"
 #include "../../include/Helper/Obj.hpp"
+#include <optional>
 
 struct Entry
 {

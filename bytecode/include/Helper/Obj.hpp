@@ -24,7 +24,7 @@ protected:
 struct ObjString : Obj
 {
     std::string chars;
-    int32_t hash;
+    uint32_t hash;
     ObjString(std::string s) : Obj(ObjType::OBJ_STRING), chars(std::move(s)) {}
 };
 

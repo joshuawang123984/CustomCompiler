@@ -56,7 +56,7 @@ Token TokenVector::token_peek()
 }
 char TokenVector::peekNext()
 {
-    if ((*current) + 1 >= source.length())
+    if ((*current) + 1 >= (int)source.length())
         return '\0';
     return source[(*current) + 1];
 }
