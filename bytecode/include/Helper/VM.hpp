@@ -1,4 +1,5 @@
 #include "types.hpp"
+#include "../../hashmap/include/Table.hpp"
 #include <iostream>
 #include <cstdint>
 #include <vector>
@@ -20,6 +21,8 @@ private:
     uint8_t *ip;
     std::vector<Value> stack;
     std::unordered_map<std::string, Value> globals;
+
+    // Table globals;
 
     InterpretResult run();
     void runtimeError(const std::string &message);

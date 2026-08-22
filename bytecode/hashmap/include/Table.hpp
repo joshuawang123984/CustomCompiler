@@ -1,9 +1,10 @@
+#pragma once
 #include "../../include/Helper/types.hpp"
 
 struct Entry
 {
     ObjString *key;
-    Value value;
+    std::optional<Value> value;
 };
 
 struct Table
@@ -15,8 +16,8 @@ struct Table
 
 struct Obj
 {
-    ObjType type;
-    Obj *next;
+    virtual ~Obj() = default;
+    Obj *next = nullptr;
 };
 
 struct ObjString : public Obj
@@ -25,17 +26,14 @@ struct ObjString : public Obj
     uint32_t hash;
     char *chars;
 
-    ObjString(char *chars, int length, uint32_t hash)
-    {
-        this->type = OBJ_STRING;
-        this->length = length;
-        this->hash = hash;
-        this->chars = chars;
-    }
+    ObjString(char *chars, int length);
 };
 
-template <typename T>
-void FREE_ARRAY(T *&entries, int &capacity);
+void adjustCapacity(Table *table, int &capacity);
 
 void initTable(Table *table);
 void freeTable(Table *table);
+bool tableGet(Table *table, ObjString *key, Value *value);
+bool tableSet(Table *table, ObjString *key, Value value);
+bool tableDelete(Table *table, ObjString *key);
+void tableAddAll(Table *from, Table *to);
