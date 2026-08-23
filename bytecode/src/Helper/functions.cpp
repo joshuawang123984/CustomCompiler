@@ -139,13 +139,13 @@ void printValue(const Value &val)
     switch (val.type)
     {
     case ValueType::VAL_BOOL:
-        std::cout << (val.as.boolean ? "true" : "false");
+        std::cout << (val.as.boolean ? "true" : "false") << std::endl;
         break;
     case ValueType::VAL_NIL:
-        std::cout << "nil";
+        std::cout << "nil" << std::endl;
         break;
     case ValueType::VAL_NUMBER:
-        std::cout << val.as.number;
+        std::cout << val.as.number << std::endl;
         break;
     case ValueType::VAL_OBJ:
         printObject(val);
