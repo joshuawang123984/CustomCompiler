@@ -58,6 +58,8 @@ private:
     void errorAt(const Token &token, const std::string &message);
 
     void expression();
+    void _and(bool canAssign);
+    void _or(bool canAssign);
     void number(bool canAssign);
     void string(bool canAssign);
     void grouping(bool canAssign);

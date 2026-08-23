@@ -106,6 +106,26 @@ void Compiler::expression()
 {
     parsePrecedence(Precedence::ASSIGNMENT);
 }
+void Compiler::_and(bool canAssign)
+{
+    int endJump = emitJump((uint8_t)OpCode::OP_JUMP_IF_FALSE);
+
+    emitByte((uint8_t)OpCode::OP_POP);
+    parsePrecedence(Precedence::AND);
+
+    patchJump(endJump);
+}
+void Compiler::_or(bool canAssign)
+{
+    int elseJump = emitJump((uint8_t)OpCode::OP_JUMP_IF_FALSE);
+    int endJump = emitJump((uint8_t)OpCode::OP_JUMP);
+
+    patchJump(elseJump);
+    emitByte((uint8_t)OpCode::OP_POP);
+
+    parsePrecedence(Precedence::OR);
+    patchJump(endJump);
+}
 void Compiler::number(bool canAssign)
 {
     Token token = tokenVector.previous();
@@ -536,8 +556,8 @@ ParseRule *Compiler::getRule(TokenType type)
             {TokenType::STRING, {&Compiler::string, nullptr, Precedence::NONE}},
             {TokenType::NUMBER, {&Compiler::number, nullptr, Precedence::NONE}},
 
-            {TokenType::AND, {nullptr, nullptr, Precedence::NONE}},
-            {TokenType::OR, {nullptr, nullptr, Precedence::NONE}},
+            {TokenType::AND, {nullptr, &Compiler::_and, Precedence::AND}},
+            {TokenType::OR, {nullptr, &Compiler::_or, Precedence::OR}},
             {TokenType::TRUE, {&Compiler::literal, nullptr, Precedence::NONE}},
             {TokenType::FALSE, {&Compiler::literal, nullptr, Precedence::NONE}},
             {TokenType::NIL, {&Compiler::literal, nullptr, Precedence::NONE}},
