@@ -1,7 +1,69 @@
 #include "../include/Compiler.hpp"
 #include "../include/Helper/Obj.hpp"
+#include "../hashmap/include/Table.hpp"
 
-Compiler::Compiler(const std::string &source, Chunk &chunk) : source(source), tokenVector("", &dummyCurrent, &dummyStart), chunk(chunk) {}
+static ObjString *TOMBSTONE = reinterpret_cast<ObjString *>(0x1);
+
+static uint32_t hashString(const std::string &str)
+{
+    uint32_t hash = 2166136261u;
+    for (char c : str)
+    {
+        hash ^= (uint8_t)c;
+        hash *= 16777619;
+    }
+    return hash;
+}
+
+static ObjString *tableFindString(Table *table, const std::string &text, uint32_t hash)
+{
+    if (table->capacity == 0)
+        return nullptr;
+
+    uint32_t index = hash % table->capacity;
+
+    for (;;)
+    {
+        Entry *entry = &table->entries[index];
+
+        if (entry->key == nullptr)
+        {
+            return nullptr;
+        }
+        else if (entry->key != TOMBSTONE && entry->key->hash == hash && entry->key->chars == text)
+        {
+            return entry->key;
+        }
+
+        index = (index + 1) % table->capacity;
+    }
+}
+
+ObjString *Compiler::copyString(const std::string &text)
+{
+    uint32_t hash = hashString(text);
+
+    ObjString *interned = tableFindString(&strings, text, hash);
+
+    if (interned != nullptr)
+    {
+        return interned;
+    }
+
+    ObjString *string = new ObjString(text);
+    string->hash = hash;
+    tableSet(&strings, string, Value{});
+
+    if (interned != nullptr)
+    {
+        std::cout << "found existing\n";
+        return interned;
+    }
+
+    return string;
+}
+
+Compiler::Compiler(const std::string &source, Chunk &chunk, Table &strings) : source(source), tokenVector("", &dummyCurrent, &dummyStart), chunk(chunk), strings(strings) {}
 bool Compiler::compile()
 {
     Scanner scanner(source);
@@ -55,7 +117,8 @@ void Compiler::string(bool canAssign)
     Token token = tokenVector.previous();
     std::string str = token.lexeme;
     str = str.substr(1, str.length() - 2);
-    ObjString *obj = new ObjString(std::move(str));
+
+    ObjString *obj = copyString(std::move(str));
     emitConstant(Value(obj));
 }
 void Compiler::grouping(bool canAssign)
@@ -165,7 +228,7 @@ void Compiler::variable(bool canAssign)
             emitBytes((uint8_t)OpCode::OP_SET_LOCAL, (uint8_t)slot);
         else
         {
-            ObjString *nameObj = new ObjString(identifier.lexeme);
+            ObjString *nameObj = copyString(identifier.lexeme);
             int nameConstant = chunk.addConstant(Value(nameObj));
             emitBytes((uint8_t)OpCode::OP_SET_GLOBAL, (uint8_t)nameConstant);
         }
@@ -178,7 +241,7 @@ void Compiler::variable(bool canAssign)
         return;
     }
 
-    ObjString *nameObj = new ObjString(identifier.lexeme);
+    ObjString *nameObj = copyString(identifier.lexeme);
     int nameConstant = chunk.addConstant(Value(nameObj));
     emitBytes((uint8_t)OpCode::OP_GET_GLOBAL, (uint8_t)nameConstant);
 }
@@ -222,6 +285,11 @@ void Compiler::statement()
     {
         advance();
         whileStatement();
+    }
+    else if (tokenVector.check(TokenType::FOR))
+    {
+        advance();
+        forStatement();
     }
     else
     {
@@ -279,6 +347,57 @@ void Compiler::whileStatement()
     patchJump(exitJump);
     emitByte((uint8_t)OpCode::OP_POP);
 }
+void Compiler::forStatement()
+{
+    beginScope();
+    consume(TokenType::LEFT_PAREN, "Expect '(' after for");
+    if (tokenVector.check(TokenType::SEMICOLON))
+    {
+    }
+    else if (tokenVector.check(TokenType::VAR))
+    {
+        advance();
+        varDeclaration();
+    }
+    else
+    {
+        expressionStatement();
+    }
+
+    int loopStart = chunk.code.size();
+    int exitJump = -1;
+    if (!tokenVector.check(TokenType::SEMICOLON))
+    {
+        expression();
+        consume(TokenType::SEMICOLON, "Expect ';' after loop condition");
+
+        exitJump = emitJump((uint8_t)OpCode::OP_JUMP_IF_FALSE);
+        emitByte((uint8_t)OpCode::OP_POP);
+    }
+
+    if (!tokenVector.check(TokenType::RIGHT_PAREN))
+    {
+        int bodyJump = emitJump((uint8_t)OpCode::OP_JUMP);
+        int incrementStart = chunk.code.size();
+        expression();
+        emitByte((uint8_t)OpCode::OP_POP);
+        consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        emitLoop(loopStart);
+        loopStart = incrementStart;
+        patchJump(bodyJump);
+    }
+
+    statement();
+    emitLoop(loopStart);
+
+    if (exitJump != -1)
+    {
+        patchJump(exitJump);
+        emitByte((uint8_t)OpCode::OP_POP);
+    }
+    endScope();
+}
 void Compiler::block()
 {
     beginScope();
@@ -294,7 +413,7 @@ void Compiler::varDeclaration()
 {
     consume(TokenType::IDENTIFIER, "Expect identifier after 'var'.");
     Token token = tokenVector.previous();
-    ObjString *nameObj = new ObjString(token.lexeme);
+    ObjString *nameObj = copyString(token.lexeme);
     int nameConstant = chunk.addConstant(Value(nameObj));
 
     if (tokenVector.check(TokenType::EQUAL))

@@ -29,10 +29,8 @@ static ObjString *tableFindString(Table *table, const std::string &text, uint32_
 
         if (entry->key == nullptr)
         {
-            if (entry->key != TOMBSTONE)
-                return nullptr;
         }
-        else if (entry->key->hash == hash && entry->key->chars == text)
+        else if (entry->key != TOMBSTONE && entry->key->hash == hash && entry->key->chars == text)
         {
             return entry->key;
         }
@@ -56,6 +54,11 @@ ObjString *VM::copyString(const std::string &text)
     tableSet(&strings, string, Value{});
 
     return string;
+}
+
+Table &VM::getStrings()
+{
+    return strings;
 }
 
 InterpretResult VM::run()

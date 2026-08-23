@@ -30,6 +30,7 @@ private:
 
 public:
     InterpretResult interpret(Chunk &chunkArg);
+    Table &getStrings();
 
     VM()
     {

@@ -20,6 +20,7 @@ enum class Precedence
 };
 
 class Compiler;
+struct Table;
 
 typedef void (Compiler::*ParseFn)(bool canAssign);
 
@@ -50,6 +51,7 @@ private:
 
     int scopeDepth = 0;
     std::vector<Local> locals;
+    Table &strings;
 
     void advance();
     void consume(TokenType type, const std::string &message);
@@ -70,6 +72,7 @@ private:
     void printStatement();
     void ifStatement();
     void whileStatement();
+    void forStatement();
     void block();
     void varDeclaration();
 
@@ -88,6 +91,8 @@ private:
     void endScope();
 
 public:
-    Compiler(const std::string &source, Chunk &chunk);
+    Compiler(const std::string &source, Chunk &chunk, Table &strings);
+
+    ObjString *copyString(const std::string &text);
     bool compile();
 };

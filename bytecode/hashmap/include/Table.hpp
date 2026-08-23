@@ -5,7 +5,7 @@
 
 struct Entry
 {
-    ObjString *key;
+    ObjString *key = nullptr;
     std::optional<Value> value;
 };
 

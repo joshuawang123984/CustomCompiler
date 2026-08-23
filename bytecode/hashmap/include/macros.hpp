@@ -21,7 +21,7 @@ T *ALLOCATE(int capacity)
     if (capacity == 0)
         return nullptr;
 
-    T *array = new T[capacity];
+    T *array = new T[capacity]();
 
     return array;
 }

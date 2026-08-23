@@ -1,5 +1,6 @@
 #include "../include/Helper/functions.hpp"
 #include "../include/Helper/chunk.hpp"
+#include "../include/Helper/VM.hpp"
 #include "../include/Scanner.hpp"
 #include "../include/Compiler.hpp"
 
@@ -41,11 +42,16 @@ void test(const std::string &source)
                   << std::endl;
     }
 
+    VM vm;
+
     Chunk chunk;
-    Compiler compiler(source, chunk);
+    Compiler compiler(source, chunk, vm.getStrings());
+
     bool ok = compiler.compile();
     if (ok)
     {
         disassembleChunk(chunk, "test");
     }
+
+    vm.interpret(chunk);
 }

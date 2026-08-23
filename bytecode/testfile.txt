@@ -24,3 +24,8 @@ while (x < 10){
     print x;
     x = x + 1;
 }
+
+for (var i = 0; i < 5; i = i + 1)
+{
+    print i;
+}
