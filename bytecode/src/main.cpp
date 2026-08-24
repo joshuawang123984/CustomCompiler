@@ -44,14 +44,15 @@ void test(const std::string &source)
 
     VM vm;
 
-    Chunk chunk;
-    Compiler compiler(source, chunk, vm.getStrings());
+    // Chunk chunk;
+    Compiler compiler(source, vm.getStrings());
+    // Compiler compiler(source, chunk, vm.getStrings());
 
     bool ok = compiler.compile();
     if (ok)
     {
-        disassembleChunk(chunk, "test");
+        LoxFunction *scriptFunction = compiler.getFunction();
+        disassembleChunk(scriptFunction->chunk, "test");
+        vm.interpret(scriptFunction->chunk);
     }
-
-    vm.interpret(chunk);
 }

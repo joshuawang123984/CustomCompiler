@@ -33,6 +33,8 @@ struct LoxFunction : Obj
     int arity = 0;
     Chunk chunk;
     ObjString *name = nullptr;
+
+    LoxFunction() : Obj(ObjType::OBJ_FUNCTION) {}
     LoxFunction(int arity, Chunk chunk, ObjString *name) : Obj(ObjType::OBJ_FUNCTION), arity(arity), chunk(std::move(chunk)), name(name) {}
 };
 

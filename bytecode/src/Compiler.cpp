@@ -63,7 +63,14 @@ ObjString *Compiler::copyString(const std::string &text)
     return string;
 }
 
-Compiler::Compiler(const std::string &source, Chunk &chunk, Table &strings) : source(source), tokenVector("", &dummyCurrent, &dummyStart), chunk(chunk), strings(strings) {}
+Compiler::Compiler(const std::string &source, Table &strings) : source(source), tokenVector("", 0, 0), strings(strings)
+{
+    function = new LoxFunction();
+    functionType = FunctionType::TYPE_SCRIPT;
+}
+
+// Compiler::Compiler(const std::string &source, Chunk &chunk, Table &strings) : source(source), tokenVector("", 0, 0), chunk(chunk), strings(strings) {}
+
 bool Compiler::compile()
 {
     Scanner scanner(source);
@@ -249,7 +256,7 @@ void Compiler::variable(bool canAssign)
         else
         {
             ObjString *nameObj = copyString(identifier.lexeme);
-            int nameConstant = chunk.addConstant(Value(nameObj));
+            int nameConstant = currentChunk()->addConstant(Value(nameObj));
             emitBytes((uint8_t)OpCode::OP_SET_GLOBAL, (uint8_t)nameConstant);
         }
         return;
@@ -262,7 +269,7 @@ void Compiler::variable(bool canAssign)
     }
 
     ObjString *nameObj = copyString(identifier.lexeme);
-    int nameConstant = chunk.addConstant(Value(nameObj));
+    int nameConstant = currentChunk()->addConstant(Value(nameObj));
     emitBytes((uint8_t)OpCode::OP_GET_GLOBAL, (uint8_t)nameConstant);
 }
 
@@ -354,7 +361,7 @@ void Compiler::ifStatement()
 }
 void Compiler::whileStatement()
 {
-    int loopStart = chunk.code.size();
+    int loopStart = currentChunk()->code.size();
     consume(TokenType::LEFT_PAREN, "Expect '(' after while");
     expression();
     consume(TokenType::RIGHT_PAREN, "Expect ')' after condition");
@@ -384,7 +391,7 @@ void Compiler::forStatement()
         expressionStatement();
     }
 
-    int loopStart = chunk.code.size();
+    int loopStart = currentChunk()->code.size();
     int exitJump = -1;
     if (!tokenVector.check(TokenType::SEMICOLON))
     {
@@ -398,7 +405,7 @@ void Compiler::forStatement()
     if (!tokenVector.check(TokenType::RIGHT_PAREN))
     {
         int bodyJump = emitJump((uint8_t)OpCode::OP_JUMP);
-        int incrementStart = chunk.code.size();
+        int incrementStart = currentChunk()->code.size();
         expression();
         emitByte((uint8_t)OpCode::OP_POP);
         consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
@@ -434,7 +441,7 @@ void Compiler::varDeclaration()
     consume(TokenType::IDENTIFIER, "Expect identifier after 'var'.");
     Token token = tokenVector.previous();
     ObjString *nameObj = copyString(token.lexeme);
-    int nameConstant = chunk.addConstant(Value(nameObj));
+    int nameConstant = currentChunk()->addConstant(Value(nameObj));
 
     if (tokenVector.check(TokenType::EQUAL))
     {
@@ -459,7 +466,7 @@ void Compiler::varDeclaration()
 
 void Compiler::emitByte(uint8_t byte)
 {
-    chunk.write(byte, tokenVector.previous().line);
+    currentChunk()->write(byte, tokenVector.previous().line);
 }
 void Compiler::emitBytes(uint8_t a, uint8_t b)
 {
@@ -468,7 +475,7 @@ void Compiler::emitBytes(uint8_t a, uint8_t b)
 }
 void Compiler::emitConstant(Value value)
 {
-    int index = chunk.addConstant(value);
+    int index = currentChunk()->addConstant(value);
     emitBytes((uint8_t)OpCode::OP_CONSTANT, (uint8_t)index);
 }
 void Compiler::emitReturn()
@@ -480,24 +487,24 @@ uint8_t Compiler::emitJump(uint8_t opcode)
 {
     emitByte((uint8_t)opcode);
     emitBytes(0xFF, 0xFF);
-    return chunk.code.size() - 2;
+    return currentChunk()->code.size() - 2;
 }
 void Compiler::patchJump(int offset)
 {
-    int jump = chunk.code.size() - offset - 2;
+    int jump = currentChunk()->code.size() - offset - 2;
     if (jump > 0xFFFF)
     {
         errorAt(tokenVector.previous(), "Too much to jump over.");
     }
 
-    chunk.code[offset] = (jump >> 8) & 0xFF;
-    chunk.code[offset + 1] = jump & 0xFF;
+    currentChunk()->code[offset] = (jump >> 8) & 0xFF;
+    currentChunk()->code[offset + 1] = jump & 0xFF;
 }
 void Compiler::emitLoop(int loopStart)
 {
     emitByte((uint8_t)OpCode::OP_LOOP);
 
-    int offset = chunk.code.size() - loopStart + 2;
+    int offset = currentChunk()->code.size() - loopStart + 2;
 
     if (offset > 0xFFFF)
         errorAt(tokenVector.previous(), "Loop body too large.");

@@ -2,6 +2,7 @@
 #include "Helper/TokenVector.hpp"
 #include "Helper/chunk.hpp"
 #include "Helper/types.hpp"
+#include "Helper/Obj.hpp"
 #include "Scanner.hpp"
 
 enum class Precedence
@@ -17,6 +18,12 @@ enum class Precedence
     UNARY,      // ! -
     CALL,       // . ()
     PRIMARY,
+};
+
+enum class FunctionType
+{
+    TYPE_FUNCTION,
+    TYPE_SCRIPT,
 };
 
 class Compiler;
@@ -42,16 +49,16 @@ class Compiler
 private:
     std::string source;
     TokenVector tokenVector;
-    Chunk &chunk;
+    // Chunk &chunk;
     bool hadError = false;
     bool panicMode = false;
-
-    int dummyStart = 0;
-    int dummyCurrent = 0;
 
     int scopeDepth = 0;
     std::vector<Local> locals;
     Table &strings;
+
+    FunctionType functionType;
+    LoxFunction *function;
 
     void advance();
     void consume(TokenType type, const std::string &message);
@@ -92,9 +99,14 @@ private:
     void beginScope();
     void endScope();
 
+    Chunk *currentChunk() { return &function->chunk; }
+
 public:
-    Compiler(const std::string &source, Chunk &chunk, Table &strings);
+    Compiler(const std::string &source, Table &strings);
+    // Compiler(const std::string &source, Chunk &chunk, Table &strings);
 
     ObjString *copyString(const std::string &text);
     bool compile();
+
+    LoxFunction *getFunction() { return function; }
 };
