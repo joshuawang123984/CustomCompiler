@@ -48,8 +48,8 @@ class Compiler
 {
 private:
     std::string source;
-    TokenVector tokenVector;
-    // Chunk &chunk;
+    TokenVector &tokenVector;
+
     bool hadError = false;
     bool panicMode = false;
 
@@ -59,6 +59,8 @@ private:
 
     FunctionType functionType;
     LoxFunction *function;
+
+    void compileFunction(FunctionType type, ObjString *nameObj);
 
     void advance();
     void consume(TokenType type, const std::string &message);
@@ -84,6 +86,7 @@ private:
     void forStatement();
     void block();
     void varDeclaration();
+    void funcDeclaration();
 
     void emitByte(uint8_t byte);
     void emitBytes(uint8_t a, uint8_t b);
@@ -102,8 +105,8 @@ private:
     Chunk *currentChunk() { return &function->chunk; }
 
 public:
-    Compiler(const std::string &source, Table &strings);
-    // Compiler(const std::string &source, Chunk &chunk, Table &strings);
+    Compiler(TokenVector &tokenVector, Table &strings);
+    Compiler(TokenVector &tokenVector, Table &strings, FunctionType type);
 
     ObjString *copyString(const std::string &text);
     bool compile();

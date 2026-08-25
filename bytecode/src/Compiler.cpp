@@ -1,5 +1,6 @@
 #include "../include/Compiler.hpp"
 #include "../include/Helper/Obj.hpp"
+#include "../include/Helper/functions.hpp"
 #include "../hashmap/include/Table.hpp"
 
 static ObjString *TOMBSTONE = reinterpret_cast<ObjString *>(0x1);
@@ -63,19 +64,49 @@ ObjString *Compiler::copyString(const std::string &text)
     return string;
 }
 
-Compiler::Compiler(const std::string &source, Table &strings) : source(source), tokenVector("", 0, 0), strings(strings)
+Compiler::Compiler(TokenVector &tokenVector, Table &strings)
+    : tokenVector(tokenVector), strings(strings), functionType(FunctionType::TYPE_SCRIPT)
 {
     function = new LoxFunction();
-    functionType = FunctionType::TYPE_SCRIPT;
 }
 
-// Compiler::Compiler(const std::string &source, Chunk &chunk, Table &strings) : source(source), tokenVector("", 0, 0), chunk(chunk), strings(strings) {}
+Compiler::Compiler(TokenVector &tokenVector, Table &strings, FunctionType type)
+    : tokenVector(tokenVector), strings(strings), functionType(type)
+{
+    function = new LoxFunction();
+}
+
+void Compiler::compileFunction(FunctionType type, ObjString *nameObj)
+{
+    Compiler functionCompiler(tokenVector, strings, type);
+    functionCompiler.function->name = nameObj;
+
+    functionCompiler.beginScope();
+
+    functionCompiler.consume(TokenType::LEFT_PAREN, "Expect '(' after func name.");
+    if (!functionCompiler.tokenVector.check(TokenType::RIGHT_PAREN))
+    {
+        do
+        {
+            functionCompiler.function->arity++;
+            functionCompiler.consume(TokenType::IDENTIFIER, "Expect parameter name.");
+            Token paramName = functionCompiler.tokenVector.previous();
+            functionCompiler.locals.push_back({paramName, functionCompiler.scopeDepth});
+        } while (functionCompiler.tokenVector.check(TokenType::COMMA) && (functionCompiler.advance(), true));
+    }
+    functionCompiler.consume(TokenType::RIGHT_PAREN, "Expect ')' after params");
+    functionCompiler.consume(TokenType::LEFT_BRACE, "Expect '{' after func sig.");
+
+    functionCompiler.block();
+    functionCompiler.emitReturn();
+
+    disassembleChunk(functionCompiler.function->chunk, "add (function body)"); // TEMP — just to verify
+
+    emitConstant(Value(functionCompiler.function));
+}
 
 bool Compiler::compile()
 {
-    Scanner scanner(source);
-    tokenVector = scanner.scanTokens();
-
     while (!tokenVector.check(TokenType::EOF_TOKEN))
     {
         declaration();
@@ -281,6 +312,11 @@ void Compiler::declaration()
         advance();
         varDeclaration();
     }
+    else if (tokenVector.check(TokenType::FUNC))
+    {
+        advance();
+        funcDeclaration();
+    }
     else
     {
         statement();
@@ -463,7 +499,24 @@ void Compiler::varDeclaration()
 
     locals.push_back({token, scopeDepth});
 }
+void Compiler::funcDeclaration()
+{
+    consume(TokenType::IDENTIFIER, "Expect identifier after 'func'.");
+    Token token = tokenVector.previous();
+    ObjString *nameObj = copyString(token.lexeme);
+    int nameConstant = currentChunk()->addConstant(Value(nameObj));
 
+    compileFunction(FunctionType::TYPE_FUNCTION, nameObj);
+
+    if (scopeDepth == 0)
+    {
+        emitBytes((uint8_t)OpCode::OP_DEFINE_GLOBAL, (uint8_t)nameConstant);
+    }
+    else
+    {
+        locals.push_back({token, scopeDepth});
+    }
+}
 void Compiler::emitByte(uint8_t byte)
 {
     currentChunk()->write(byte, tokenVector.previous().line);
@@ -480,6 +533,7 @@ void Compiler::emitConstant(Value value)
 }
 void Compiler::emitReturn()
 {
+    emitByte((uint8_t)OpCode::OP_NIL);
     emitByte((uint8_t)OpCode::OP_RETURN);
 }
 

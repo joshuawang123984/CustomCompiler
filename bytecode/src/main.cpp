@@ -43,12 +43,9 @@ void test(const std::string &source)
     }
 
     VM vm;
-
-    // Chunk chunk;
-    Compiler compiler(source, vm.getStrings());
-    // Compiler compiler(source, chunk, vm.getStrings());
-
+    Compiler compiler(tokens, vm.getStrings());
     bool ok = compiler.compile();
+
     if (ok)
     {
         LoxFunction *scriptFunction = compiler.getFunction();
