@@ -14,15 +14,22 @@ enum class InterpretResult
     INTERPRET_RUNTIME_ERROR,
 };
 
+struct CallFrame
+{
+    LoxFunction *function;
+    uint8_t *ip;
+    size_t slotStart;
+};
+
 class VM
 {
 private:
-    Chunk *chunk;
-    uint8_t *ip;
     std::vector<Value> stack;
 
     Table globals;
     Table strings;
+
+    std::vector<CallFrame> frames;
 
     ObjString *copyString(const std::string &text);
     InterpretResult run();

@@ -40,6 +40,21 @@ static ObjString *tableFindString(Table *table, const std::string &text, uint32_
     }
 }
 
+uint8_t Compiler::argumentList()
+{
+    uint8_t argCount = 0;
+    if (!tokenVector.check(TokenType::RIGHT_PAREN))
+    {
+        do
+        {
+            expression();
+            argCount++;
+        } while (tokenVector.token_match(TokenType::COMMA));
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
+    return argCount;
+}
+
 ObjString *Compiler::copyString(const std::string &text)
 {
     uint32_t hash = hashString(text);
@@ -163,6 +178,11 @@ void Compiler::_or(bool canAssign)
 
     parsePrecedence(Precedence::OR);
     patchJump(endJump);
+}
+void Compiler::call(bool canAssign)
+{
+    uint8_t argCount = argumentList();
+    emitBytes((uint8_t)OpCode::OP_CALL, argCount);
 }
 void Compiler::number(bool canAssign)
 {
@@ -461,6 +481,9 @@ void Compiler::forStatement()
     }
     endScope();
 }
+void Compiler::returnStatement()
+{
+}
 void Compiler::block()
 {
     beginScope();
@@ -592,7 +615,7 @@ ParseRule *Compiler::getRule(TokenType type)
 {
     static std::unordered_map<TokenType, ParseRule> rules =
         {
-            {TokenType::LEFT_PAREN, {&Compiler::grouping, nullptr, Precedence::NONE}},
+            {TokenType::LEFT_PAREN, {&Compiler::grouping, &Compiler::call, Precedence::CALL}},
             {TokenType::RIGHT_PAREN, {nullptr, nullptr, Precedence::NONE}},
             {TokenType::LEFT_BRACE, {nullptr, nullptr, Precedence::NONE}},
             {TokenType::RIGHT_BRACE, {nullptr, nullptr, Precedence::NONE}},

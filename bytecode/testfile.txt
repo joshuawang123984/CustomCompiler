@@ -46,3 +46,5 @@ if (a == 10 and b == 10)
 func add(c, d) {
     print c + d;
 }
+
+print add(2, 3);

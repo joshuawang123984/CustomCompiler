@@ -63,10 +63,12 @@ Table &VM::getStrings()
 
 InterpretResult VM::run()
 {
+    CallFrame *frame = &frames.back();
+
     while (true)
     {
-        uint8_t instruction = *ip;
-        ip++;
+        uint8_t instruction = *frame->ip;
+        frame->ip++;
 
         switch (instruction)
         {
@@ -75,9 +77,9 @@ InterpretResult VM::run()
 
         case (uint8_t)OpCode::OP_CONSTANT:
         {
-            uint8_t constIndex = *ip;
-            ip++;
-            Value constant = chunk->constants[constIndex];
+            uint8_t constIndex = *frame->ip;
+            frame->ip++;
+            Value constant = frame->function->chunk.constants[constIndex];
             stack.push_back(constant);
             break;
         }
@@ -220,18 +222,18 @@ InterpretResult VM::run()
         }
         case (uint8_t)OpCode::OP_DEFINE_GLOBAL:
         {
-            uint8_t nameIndex = *ip;
-            ip++;
-            ObjString *name = chunk->constants[nameIndex].asString();
+            uint8_t nameIndex = *frame->ip;
+            frame->ip++;
+            ObjString *name = frame->function->chunk.constants[nameIndex].asString();
             tableSet(&globals, name, stack.back());
             stack.pop_back();
             break;
         }
         case (uint8_t)OpCode::OP_GET_GLOBAL:
         {
-            uint8_t nameIndex = *ip;
-            ip++;
-            ObjString *name = chunk->constants[nameIndex].asString();
+            uint8_t nameIndex = *frame->ip;
+            frame->ip++;
+            ObjString *name = frame->function->chunk.constants[nameIndex].asString();
             Value value;
             if (!tableGet(&globals, name, &value))
             {
@@ -243,9 +245,9 @@ InterpretResult VM::run()
         }
         case (uint8_t)OpCode::OP_SET_GLOBAL:
         {
-            uint8_t nameIndex = *ip;
-            ip++;
-            ObjString *name = chunk->constants[nameIndex].asString();
+            uint8_t nameIndex = *frame->ip;
+            frame->ip++;
+            ObjString *name = frame->function->chunk.constants[nameIndex].asString();
 
             if (tableSet(&globals, name, stack.back()))
             {
@@ -258,42 +260,46 @@ InterpretResult VM::run()
         }
         case (uint8_t)OpCode::OP_SET_LOCAL:
         {
-            uint8_t nameIndex = *ip;
-            ip++;
+            uint8_t nameIndex = *frame->ip;
+            frame->ip++;
             stack[nameIndex] = stack.back();
             break;
         }
         case (uint8_t)OpCode::OP_GET_LOCAL:
         {
-            uint8_t nameIndex = *ip;
-            ip++;
+            uint8_t nameIndex = *frame->ip;
+            frame->ip++;
             stack.push_back(stack[nameIndex]);
             break;
         }
         case (uint8_t)OpCode::OP_JUMP:
         {
-            uint16_t offset = (ip[0] << 8) | ip[1];
-            ip += 2;
-            ip += offset;
+            uint16_t offset = (frame->ip[0] << 8) | frame->ip[1];
+            frame->ip += 2;
+            frame->ip += offset;
             break;
         }
         case (uint8_t)OpCode::OP_JUMP_IF_FALSE:
         {
-            uint16_t offset = (ip[0] << 8) | ip[1];
-            ip += 2;
+            uint16_t offset = (frame->ip[0] << 8) | frame->ip[1];
+            frame->ip += 2;
             Value condition = stack.back();
             bool falsy = (condition.type == ValueType::VAL_NIL) || (condition.type == ValueType::VAL_BOOL && !condition.as.boolean);
             if (falsy)
             {
-                ip += offset;
+                frame->ip += offset;
             }
             break;
         }
         case (uint8_t)OpCode::OP_LOOP:
         {
-            uint16_t offset = (ip[0] << 8) | ip[1];
-            ip += 2;
-            ip -= offset;
+            uint16_t offset = (frame->ip[0] << 8) | frame->ip[1];
+            frame->ip += 2;
+            frame->ip -= offset;
+            break;
+        }
+        case (uint8_t)OpCode::OP_CALL:
+        {
             break;
         }
         case (uint8_t)OpCode::OP_NIL:
@@ -305,15 +311,15 @@ InterpretResult VM::run()
 
 InterpretResult VM::interpret(Chunk &chunkArg)
 {
-    chunk = &chunkArg;
-    ip = chunk->code.data();
+    (&frames.back())->function->chunk = chunkArg;
+    (&frames.back())->ip = (&frames.back())->function->chunk.code.data();
     return run();
 }
 
 void VM::runtimeError(const std::string &message)
 {
-    size_t instructionIndex = ip - chunk->code.data() - 1;
-    int line = chunk->lines[instructionIndex];
+    size_t instructionIndex = (&frames.back())->ip - (&frames.back())->function->chunk.code.data() - 1;
+    int line = (&frames.back())->function->chunk.lines[instructionIndex];
     std::cerr << "[line " << line << "] Runtime Error: " << message << std::endl;
     stack.clear();
 }

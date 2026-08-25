@@ -61,6 +61,7 @@ private:
     LoxFunction *function;
 
     void compileFunction(FunctionType type, ObjString *nameObj);
+    uint8_t argumentList();
 
     void advance();
     void consume(TokenType type, const std::string &message);
@@ -69,6 +70,7 @@ private:
     void expression();
     void _and(bool canAssign);
     void _or(bool canAssign);
+    void call(bool canAssign);
     void number(bool canAssign);
     void string(bool canAssign);
     void grouping(bool canAssign);
@@ -84,6 +86,7 @@ private:
     void ifStatement();
     void whileStatement();
     void forStatement();
+    void returnStatement();
     void block();
     void varDeclaration();
     void funcDeclaration();
