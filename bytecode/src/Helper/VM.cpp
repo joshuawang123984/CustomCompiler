@@ -73,8 +73,23 @@ InterpretResult VM::run()
         switch (instruction)
         {
         case (uint8_t)OpCode::OP_RETURN:
-            return InterpretResult::INTERPRET_OK;
+        {
+            Value result = stack.back();
+            stack.pop_back();
 
+            size_t frameBase = frame->slotStart - 1;
+            frames.pop_back();
+
+            if (frames.empty())
+            {
+                return InterpretResult::INTERPRET_OK; // global script is done
+            }
+
+            stack.resize(frameBase);
+            stack.push_back(result);
+            frame = &frames.back();
+            break;
+        }
         case (uint8_t)OpCode::OP_CONSTANT:
         {
             uint8_t constIndex = *frame->ip;
@@ -260,16 +275,16 @@ InterpretResult VM::run()
         }
         case (uint8_t)OpCode::OP_SET_LOCAL:
         {
-            uint8_t nameIndex = *frame->ip;
+            uint8_t slot = *frame->ip;
             frame->ip++;
-            stack[nameIndex] = stack.back();
+            stack[frame->slotStart + slot] = stack.back();
             break;
         }
         case (uint8_t)OpCode::OP_GET_LOCAL:
         {
-            uint8_t nameIndex = *frame->ip;
+            uint8_t slot = *frame->ip;
             frame->ip++;
-            stack.push_back(stack[nameIndex]);
+            stack.push_back(stack[frame->slotStart + slot]);
             break;
         }
         case (uint8_t)OpCode::OP_JUMP:
@@ -300,6 +315,31 @@ InterpretResult VM::run()
         }
         case (uint8_t)OpCode::OP_CALL:
         {
+            uint8_t argCount = *frame->ip;
+            frame->ip++;
+
+            Value callee = stack[stack.size() - 1 - argCount];
+
+            if (!callee.isFunction())
+            {
+                runtimeError("not a function");
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+
+            LoxFunction *fn = callee.asFunction();
+            if (argCount != fn->arity)
+            {
+                runtimeError("Expected " + std::to_string(fn->arity) + " arguments but got " + std::to_string(argCount));
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+
+            CallFrame newFrame;
+            newFrame.function = fn;
+            newFrame.ip = fn->chunk.code.data();
+            newFrame.slotStart = stack.size() - argCount;
+
+            frames.push_back(newFrame);
+            frame = &frames.back();
             break;
         }
         case (uint8_t)OpCode::OP_NIL:
