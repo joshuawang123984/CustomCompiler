@@ -2,6 +2,7 @@
 #include <string>
 
 struct Obj;
+struct ObjNative;
 struct ObjString;
 struct LoxFunction;
 struct LoxClass;

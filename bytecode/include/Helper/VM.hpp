@@ -34,6 +34,7 @@ private:
     ObjString *copyString(const std::string &text);
     InterpretResult run();
     void runtimeError(const std::string &message);
+    void defineNative(const std::string &name, NativeFn function);
 
 public:
     InterpretResult interpret(LoxFunction *script);

@@ -323,7 +323,12 @@ InterpretResult VM::run()
 
             if (callee.isNative())
             {
-                // finish this, then write a func in vm to register the native func to globals field
+                NativeFn native = callee.asNative()->function;
+                // make sure this is right
+                Value result = native(argCount, &stack[stack.size() - argCount]);
+                stack.resize(stack.size() - argCount - 1);
+                stack.push_back(result);
+                break;
             }
 
             else if (!callee.isFunction())
@@ -372,4 +377,14 @@ void VM::runtimeError(const std::string &message)
     int line = (&frames.back())->function->chunk.lines[instructionIndex];
     std::cerr << "[line " << line << "] Runtime Error: " << message << std::endl;
     stack.clear();
+}
+
+void VM::defineNative(const std::string &name, NativeFn function)
+{
+    ObjString *nameObj = copyString(name);
+    stack.push_back(Value(nameObj));
+    stack.push_back(Value(new ObjNative(function)));
+    tableSet(&globals, nameObj, stack[stack.size() - 1]);
+    stack.pop_back();
+    stack.pop_back();
 }
