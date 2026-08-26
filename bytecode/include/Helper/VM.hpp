@@ -36,7 +36,7 @@ private:
     void runtimeError(const std::string &message);
 
 public:
-    InterpretResult interpret(Chunk &chunkArg);
+    InterpretResult interpret(LoxFunction *script);
     Table &getStrings();
 
     VM()

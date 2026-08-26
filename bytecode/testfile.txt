@@ -48,3 +48,11 @@ func add(c, d) {
 }
 
 print add(2, 3);
+
+func countdown(n) {
+    if (n > 0) {
+        print n;
+        countdown(n - 1);
+    }
+}
+countdown(3);

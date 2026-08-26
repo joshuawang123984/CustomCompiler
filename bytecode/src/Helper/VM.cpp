@@ -29,6 +29,7 @@ static ObjString *tableFindString(Table *table, const std::string &text, uint32_
 
         if (entry->key == nullptr)
         {
+            return nullptr;
         }
         else if (entry->key != TOMBSTONE && entry->key->hash == hash && entry->key->chars == text)
         {
@@ -349,10 +350,14 @@ InterpretResult VM::run()
     }
 }
 
-InterpretResult VM::interpret(Chunk &chunkArg)
+InterpretResult VM::interpret(LoxFunction *script)
 {
-    (&frames.back())->function->chunk = chunkArg;
-    (&frames.back())->ip = (&frames.back())->function->chunk.code.data();
+    CallFrame frame;
+    frame.function = script;
+    frame.ip = script->chunk.code.data();
+    frame.slotStart = 0;
+
+    frames.push_back(frame);
     return run();
 }
 

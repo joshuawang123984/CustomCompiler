@@ -483,6 +483,22 @@ void Compiler::forStatement()
 }
 void Compiler::returnStatement()
 {
+    if (functionType == FunctionType::TYPE_SCRIPT)
+    {
+        errorAt(tokenVector.previous(), "Can't return from script");
+    }
+
+    if (tokenVector.check(TokenType::SEMICOLON))
+    {
+        advance();
+        emitReturn();
+    }
+    else
+    {
+        expression();
+        consume(TokenType::SEMICOLON, "Expect ';' after return value");
+        emitByte((uint8_t)OpCode::OP_RETURN);
+    }
 }
 void Compiler::block()
 {

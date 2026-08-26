@@ -50,6 +50,6 @@ void test(const std::string &source)
     {
         LoxFunction *scriptFunction = compiler.getFunction();
         disassembleChunk(scriptFunction->chunk, "test");
-        vm.interpret(scriptFunction->chunk);
+        vm.interpret(scriptFunction);
     }
 }
