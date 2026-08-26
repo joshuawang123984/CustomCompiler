@@ -36,3 +36,12 @@ LoxFunction *Value::asFunction() const
 {
     return static_cast<LoxFunction *>(as.obj);
 }
+
+bool Value::isNative() const
+{
+    return type == ValueType::VAL_OBJ && as.obj->type == ObjType::OBJ_NATIVE;
+}
+ObjNative *Value::asNative() const
+{
+    return static_cast<ObjNative *>(as.obj);
+}

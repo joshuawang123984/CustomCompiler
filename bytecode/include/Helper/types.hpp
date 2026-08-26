@@ -41,4 +41,7 @@ struct Value
 
     bool isFunction() const;
     LoxFunction *asFunction() const;
+
+    bool isNative() const;
+    ObjNative *asNative() const;
 };

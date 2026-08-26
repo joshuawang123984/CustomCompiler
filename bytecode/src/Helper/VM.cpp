@@ -321,7 +321,12 @@ InterpretResult VM::run()
 
             Value callee = stack[stack.size() - 1 - argCount];
 
-            if (!callee.isFunction())
+            if (callee.isNative())
+            {
+                // finish this, then write a func in vm to register the native func to globals field
+            }
+
+            else if (!callee.isFunction())
             {
                 runtimeError("not a function");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;

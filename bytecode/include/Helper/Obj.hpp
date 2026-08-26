@@ -10,6 +10,7 @@ enum class ObjType
     OBJ_FUNCTION,
     OBJ_CLASS,
     OBJ_INSTANCE,
+    OBJ_NATIVE,
 };
 
 struct Obj
@@ -19,6 +20,14 @@ struct Obj
 
 protected:
     Obj(ObjType type) : type(type) {}
+};
+
+typedef Value (*NativeFn)(int argCount, Value *args);
+
+struct ObjNative : Obj
+{
+    NativeFn function;
+    ObjNative(NativeFn fn) : Obj(ObjType::OBJ_NATIVE), function(fn) {}
 };
 
 struct ObjString : Obj
