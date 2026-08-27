@@ -21,6 +21,8 @@ struct CallFrame
     size_t slotStart;
 };
 
+Value clockNative(int argCount, Value *args);
+
 class VM
 {
 private:
@@ -44,6 +46,8 @@ public:
     {
         initTable(&globals);
         initTable(&strings);
+
+        defineNative("clock", clockNative);
     }
 
     ~VM()

@@ -174,6 +174,9 @@ void printObject(const Value &val)
     case ObjType::OBJ_FUNCTION:
         std::cout << "<fn " << (val.asFunction()->name ? val.asFunction()->name->chars : "anonymous") << ">" << std::endl;
         break;
+    case ObjType::OBJ_NATIVE:
+        std::cout << "<native fn>" << std::endl;
+        break;
     }
 }
 

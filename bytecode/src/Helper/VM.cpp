@@ -3,6 +3,8 @@
 #include "../../include/Helper/functions.hpp"
 #include "../../include/Helper/Obj.hpp"
 
+#include <ctime>
+
 static ObjString *TOMBSTONE = reinterpret_cast<ObjString *>(0x1);
 
 static uint32_t hashString(const std::string &str)
@@ -38,6 +40,11 @@ static ObjString *tableFindString(Table *table, const std::string &text, uint32_
 
         index = (index + 1) % table->capacity;
     }
+}
+
+Value clockNative(int argCount, Value *args)
+{
+    return Value((double)clock() / CLOCKS_PER_SEC);
 }
 
 ObjString *VM::copyString(const std::string &text)

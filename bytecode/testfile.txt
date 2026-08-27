@@ -56,3 +56,9 @@ func countdown(n) {
     }
 }
 countdown(3);
+
+print clock();
+for (var i = 0; i < 1000; i = i + 1) {
+   // print i;
+}
+print clock();
