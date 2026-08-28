@@ -16,6 +16,7 @@ enum class InterpretResult
 
 struct CallFrame
 {
+    ObjClosure *closure;
     LoxFunction *function;
     uint8_t *ip;
     size_t slotStart;
@@ -37,6 +38,7 @@ private:
     InterpretResult run();
     void runtimeError(const std::string &message);
     void defineNative(const std::string &name, NativeFn function);
+    ObjUpvalue *captureUpvalue(Value *localSlot);
 
 public:
     InterpretResult interpret(LoxFunction *script);

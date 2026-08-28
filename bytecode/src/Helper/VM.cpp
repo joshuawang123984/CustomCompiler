@@ -338,22 +338,23 @@ InterpretResult VM::run()
                 break;
             }
 
-            else if (!callee.isFunction())
+            else if (!callee.isClosure())
             {
                 runtimeError("not a function");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
 
-            LoxFunction *fn = callee.asFunction();
-            if (argCount != fn->arity)
+            LoxFunction *fn = callee.asClosure();
+            if (argCount != closure->function->arity)
             {
-                runtimeError("Expected " + std::to_string(fn->arity) + " arguments but got " + std::to_string(argCount));
+                runtimeError("Expected " + std::to_string(closure->function->arity) + " arguments but got " + std::to_string(argCount));
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
 
             CallFrame newFrame;
-            newFrame.function = fn;
-            newFrame.ip = fn->chunk.code.data();
+            newFrame.closure = closure;
+            newFrame.ip = closure->function->chunk.code.data();
+            // also add a -1 to the end?
             newFrame.slotStart = stack.size() - argCount;
 
             frames.push_back(newFrame);
@@ -362,7 +363,30 @@ InterpretResult VM::run()
         }
         case (uint8_t)OpCode::OP_CLOSURE:
         {
+            uint8_t constIndex = *frame->ip;
+            frame->ip++;
+            LoxFunction *fn = frame->function->chunk.constants[constIndex].asFunction();
 
+            ObjClosure *closure = new ObjClosure(fn);
+
+            for (int i = 0; i < fn->upvalueCount; i++)
+            {
+                uint8_t isLocal = *frame->ip;
+                frame->ip++;
+                uint8_t index = *frame->ip;
+                frame->ip++;
+
+                if (isLocal)
+                {
+                    closure->upvalues.push_back(captureUpvalue(&stack[frame->slotStart + index]));
+                }
+                else
+                {
+                    closure->upvalues.push_back(frame->closure->upvalues[index]);
+                }
+            }
+
+            stack.push_back(Value(closure));
             break;
         }
         case (uint8_t)OpCode::OP_GET_UPVALUE:
@@ -413,4 +437,8 @@ void VM::defineNative(const std::string &name, NativeFn function)
     tableSet(&globals, nameObj, stack[stack.size() - 1]);
     stack.pop_back();
     stack.pop_back();
+}
+
+ObjUpvalue *VM::captureUpvalue(Value *localSlot)
+{
 }
