@@ -34,6 +34,8 @@ private:
 
     std::vector<CallFrame> frames;
 
+    ObjUpvalue *openUpvalues = nullptr;
+
     ObjString *copyString(const std::string &text);
     InterpretResult run();
     void runtimeError(const std::string &message);

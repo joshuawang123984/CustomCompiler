@@ -344,7 +344,7 @@ InterpretResult VM::run()
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
 
-            LoxFunction *fn = callee.asClosure();
+            ObjClosure *closure = callee.asClosure();
             if (argCount != closure->function->arity)
             {
                 runtimeError("Expected " + std::to_string(closure->function->arity) + " arguments but got " + std::to_string(argCount));
@@ -441,4 +441,31 @@ void VM::defineNative(const std::string &name, NativeFn function)
 
 ObjUpvalue *VM::captureUpvalue(Value *localSlot)
 {
+    ObjUpvalue *prev = nullptr;
+    ObjUpvalue *current = openUpvalues;
+
+    while (current != nullptr && current->location > localSlot)
+    {
+        prev = current;
+        current = current->next;
+    }
+
+    if (current != nullptr && current->location > localSlot)
+    {
+        return current;
+    }
+
+    ObjUpvalue *created = new ObjUpvalue(localSlot);
+    created->next = current;
+
+    if (prev == nullptr)
+    {
+        openUpvalues = created;
+    }
+    else
+    {
+        prev->next = created;
+    }
+
+    return created;
 }
