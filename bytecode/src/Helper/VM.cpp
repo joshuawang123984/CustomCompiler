@@ -362,14 +362,21 @@ InterpretResult VM::run()
         }
         case (uint8_t)OpCode::OP_CLOSURE:
         {
+
             break;
         }
         case (uint8_t)OpCode::OP_GET_UPVALUE:
         {
+            uint8_t slot = *frame->ip;
+            frame->ip++;
+            stack.push_back(*frame->closure->upvalues[slot]->location);
             break;
         }
         case (uint8_t)OpCode::OP_SET_UPVALUE:
         {
+            uint8_t slot = *frame->ip;
+            frame->ip++;
+            *frame->closure->upvalues[slot]->location = stack.back();
             break;
         }
         case (uint8_t)OpCode::OP_NIL:
