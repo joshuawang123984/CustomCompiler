@@ -2,9 +2,11 @@
 #include <string>
 
 struct Obj;
+struct ObjUpvalue;
 struct ObjNative;
 struct ObjString;
 struct LoxFunction;
+struct ObjClosure;
 struct LoxClass;
 struct LoxInstance;
 
@@ -45,4 +47,10 @@ struct Value
 
     bool isNative() const;
     ObjNative *asNative() const;
+
+    bool isClosure() const;
+    ObjClosure *asClosure() const;
+
+    bool isUpValue() const;
+    ObjUpvalue *asUpValue() const;
 };

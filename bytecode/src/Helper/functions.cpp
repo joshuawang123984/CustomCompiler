@@ -129,6 +129,12 @@ int disassembleInstruction(Chunk &chunk, int offset)
         return jumpInstruction("OP_LOOP", -1, chunk, offset);
     case (uint8_t)OpCode::OP_CALL:
         return byteInstruction("OP_CALL", chunk, offset);
+    case (uint8_t)OpCode::OP_CLOSURE:
+        return byteInstruction("OP_CLOSURE", chunk, offset);
+    case (uint8_t)OpCode::OP_GET_UPVALUE:
+        return byteInstruction("OP_GET_UPVALUE", chunk, offset);
+    case (uint8_t)OpCode::OP_SET_UPVALUE:
+        return byteInstruction("OP_SET_UPVALUE", chunk, offset);
 
     default:
         std::cout << "Unknown opcode " << (int)instruction << std::endl;
@@ -176,6 +182,12 @@ void printObject(const Value &val)
         break;
     case ObjType::OBJ_NATIVE:
         std::cout << "<native fn>" << std::endl;
+        break;
+    case ObjType::OBJ_CLOSURE:
+        std::cout << "<fn " << (val.asClosure()->function->name ? val.asClosure()->function->name->chars : "anonymous") << ">" << std::endl;
+        break;
+    case ObjType::OBJ_UPVALUE:
+        std::cout << "upvalue" << std::endl;
         break;
     }
 }

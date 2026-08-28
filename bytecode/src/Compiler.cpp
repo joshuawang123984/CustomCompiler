@@ -94,6 +94,8 @@ Compiler::Compiler(TokenVector &tokenVector, Table &strings, FunctionType type)
 void Compiler::compileFunction(FunctionType type, ObjString *nameObj)
 {
     Compiler functionCompiler(tokenVector, strings, type);
+    functionCompiler.enclosing = this;
+
     functionCompiler.function->name = nameObj;
 
     functionCompiler.beginScope();
@@ -153,6 +155,47 @@ void Compiler::errorAt(const Token &token, const std::string &message)
     std::cout << "[line " << token.line << "] Error (TokenType " << static_cast<int>(tokenVector.previous().type) << "): " << message << std::endl;
     hadError = true;
     panicMode = true;
+}
+
+int Compiler::addUpvalue(uint8_t index, bool isLocal)
+{
+    for (size_t i = 0; i < upvalues.size(); i++)
+    {
+        if (upvalues[i].index == index && upvalues[i].isLocal == isLocal)
+        {
+            return (int)i;
+        }
+    }
+
+    upvalues.push_back({index, isLocal});
+    function->upvalueCount++;
+    return (int)upvalues.size() - 1;
+}
+
+int Compiler::resolveLocal(const Token &name)
+{
+    for (int i = locals.size() - 1; i >= 0; --i)
+    {
+        if (locals[i].name.lexeme == name.lexeme)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+int Compiler::resolveUpvalue(const Token &name)
+{
+    if (enclosing == nullptr)
+        return -1;
+
+    int local = enclosing->resolveLocal(name);
+    if (local != -1)
+    {
+        return addUpvalue((uint8_t)local, true);
+    }
+
+    return -1;
 }
 
 void Compiler::expression()
@@ -287,15 +330,7 @@ void Compiler::variable(bool canAssign)
 {
     Token identifier = tokenVector.previous();
 
-    int slot = -1;
-    for (int i = locals.size() - 1; i >= 0; --i)
-    {
-        if (locals[i].name.lexeme == identifier.lexeme)
-        {
-            slot = i;
-            break;
-        }
-    }
+    int slot = resolveLocal(identifier);
 
     if (canAssign && tokenVector.check(TokenType::EQUAL))
     {
@@ -316,6 +351,13 @@ void Compiler::variable(bool canAssign)
     if (slot != -1)
     {
         emitBytes((uint8_t)OpCode::OP_GET_LOCAL, (uint8_t)slot);
+        return;
+    }
+
+    int upvalueSlot = resolveUpvalue(identifier);
+    if (upvalueSlot != -1)
+    {
+        emitBytes((uint8_t)OpCode::OP_GET_UPVALUE, upvalueSlot);
         return;
     }
 

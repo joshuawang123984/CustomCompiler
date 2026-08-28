@@ -44,6 +44,12 @@ struct Local
     int depth;
 };
 
+struct UpvalueInfo
+{
+    uint8_t index;
+    bool isLocal;
+};
+
 class Compiler
 {
 private:
@@ -60,12 +66,19 @@ private:
     FunctionType functionType;
     LoxFunction *function;
 
+    Compiler *enclosing = nullptr;
+    std::vector<UpvalueInfo> upvalues;
+
     void compileFunction(FunctionType type, ObjString *nameObj);
     uint8_t argumentList();
 
     void advance();
     void consume(TokenType type, const std::string &message);
     void errorAt(const Token &token, const std::string &message);
+
+    int addUpvalue(uint8_t index, bool isLocal);
+    int resolveLocal(const Token &name);
+    int resolveUpvalue(const Token &name);
 
     void expression();
     void _and(bool canAssign);

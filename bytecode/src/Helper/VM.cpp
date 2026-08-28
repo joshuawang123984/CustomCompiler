@@ -360,6 +360,18 @@ InterpretResult VM::run()
             frame = &frames.back();
             break;
         }
+        case (uint8_t)OpCode::OP_CLOSURE:
+        {
+            break;
+        }
+        case (uint8_t)OpCode::OP_GET_UPVALUE:
+        {
+            break;
+        }
+        case (uint8_t)OpCode::OP_SET_UPVALUE:
+        {
+            break;
+        }
         case (uint8_t)OpCode::OP_NIL:
             stack.push_back(Value());
             break;

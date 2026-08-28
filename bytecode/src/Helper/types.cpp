@@ -45,3 +45,21 @@ ObjNative *Value::asNative() const
 {
     return static_cast<ObjNative *>(as.obj);
 }
+
+bool Value::isClosure() const
+{
+    return type == ValueType::VAL_OBJ && as.obj->type == ObjType::OBJ_CLOSURE;
+}
+ObjClosure *Value::asClosure() const
+{
+    return static_cast<ObjClosure *>(as.obj);
+}
+
+bool Value::isUpValue() const
+{
+    return type == ValueType::VAL_OBJ && as.obj->type == ObjType::OBJ_UPVALUE;
+}
+ObjUpvalue *Value::asUpValue() const
+{
+    return static_cast<ObjUpvalue *>(as.obj);
+}
