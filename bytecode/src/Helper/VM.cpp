@@ -85,6 +85,8 @@ InterpretResult VM::run()
             Value result = stack.back();
             stack.pop_back();
 
+            closeUpvalues(&stack[frame->slotStart]);
+
             size_t frameBase = frame->slotStart - 1;
             frames.pop_back();
 
@@ -102,7 +104,7 @@ InterpretResult VM::run()
         {
             uint8_t constIndex = *frame->ip;
             frame->ip++;
-            Value constant = frame->function->chunk.constants[constIndex];
+            Value constant = frame->closure->function->chunk.constants[constIndex];
             stack.push_back(constant);
             break;
         }
@@ -247,7 +249,7 @@ InterpretResult VM::run()
         {
             uint8_t nameIndex = *frame->ip;
             frame->ip++;
-            ObjString *name = frame->function->chunk.constants[nameIndex].asString();
+            ObjString *name = frame->closure->function->chunk.constants[nameIndex].asString();
             tableSet(&globals, name, stack.back());
             stack.pop_back();
             break;
@@ -256,7 +258,7 @@ InterpretResult VM::run()
         {
             uint8_t nameIndex = *frame->ip;
             frame->ip++;
-            ObjString *name = frame->function->chunk.constants[nameIndex].asString();
+            ObjString *name = frame->closure->function->chunk.constants[nameIndex].asString();
             Value value;
             if (!tableGet(&globals, name, &value))
             {
@@ -270,7 +272,7 @@ InterpretResult VM::run()
         {
             uint8_t nameIndex = *frame->ip;
             frame->ip++;
-            ObjString *name = frame->function->chunk.constants[nameIndex].asString();
+            ObjString *name = frame->closure->function->chunk.constants[nameIndex].asString();
 
             if (tableSet(&globals, name, stack.back()))
             {
@@ -354,7 +356,6 @@ InterpretResult VM::run()
             CallFrame newFrame;
             newFrame.closure = closure;
             newFrame.ip = closure->function->chunk.code.data();
-            // also add a -1 to the end?
             newFrame.slotStart = stack.size() - argCount;
 
             frames.push_back(newFrame);
@@ -365,7 +366,7 @@ InterpretResult VM::run()
         {
             uint8_t constIndex = *frame->ip;
             frame->ip++;
-            LoxFunction *fn = frame->function->chunk.constants[constIndex].asFunction();
+            LoxFunction *fn = frame->closure->function->chunk.constants[constIndex].asFunction();
 
             ObjClosure *closure = new ObjClosure(fn);
 
@@ -412,12 +413,15 @@ InterpretResult VM::run()
 
 InterpretResult VM::interpret(LoxFunction *script)
 {
+    ObjClosure *closure = new ObjClosure(script);
+
     CallFrame frame;
-    frame.function = script;
-    frame.ip = script->chunk.code.data();
+    frame.closure = closure;
+    frame.ip = closure->function->chunk.code.data();
     frame.slotStart = 0;
 
     frames.push_back(frame);
+
     return run();
 }
 
@@ -468,4 +472,15 @@ ObjUpvalue *VM::captureUpvalue(Value *localSlot)
     }
 
     return created;
+}
+
+void VM::closeUpvalues(Value *last)
+{
+    while (openUpvalues != nullptr && openUpvalues->location >= last)
+    {
+        ObjUpvalue *upvalue = openUpvalues;
+        upvalue->closed = *upvalue->location;
+        upvalue->location = &upvalue->closed;
+        openUpvalues = upvalue->next;
+    }
 }

@@ -119,7 +119,14 @@ void Compiler::compileFunction(FunctionType type, ObjString *nameObj)
 
     disassembleChunk(functionCompiler.function->chunk, "add (function body)"); // TEMP — just to verify
 
-    emitConstant(Value(functionCompiler.function));
+    uint8_t functionConstant = currentChunk()->addConstant(Value(functionCompiler.function));
+    emitBytes((uint8_t)OpCode::OP_CLOSURE, functionConstant);
+
+    for (const UpvalueInfo &upvalue : functionCompiler.upvalues)
+    {
+        emitByte(upvalue.isLocal ? 1 : 0);
+        emitByte(upvalue.index);
+    }
 }
 
 bool Compiler::compile()

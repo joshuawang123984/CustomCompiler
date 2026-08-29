@@ -62,3 +62,17 @@ for (var i = 0; i < 1000; i = i + 1) {
    // print i;
 }
 print clock();
+
+
+//closures
+func outer() {
+    var x = 10;
+
+    func inner() {
+        print x;
+    }
+
+    inner();
+}
+
+outer();

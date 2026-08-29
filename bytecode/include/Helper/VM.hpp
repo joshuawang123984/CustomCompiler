@@ -41,6 +41,7 @@ private:
     void runtimeError(const std::string &message);
     void defineNative(const std::string &name, NativeFn function);
     ObjUpvalue *captureUpvalue(Value *localSlot);
+    void closeUpvalues(Value *last);
 
 public:
     InterpretResult interpret(LoxFunction *script);
