@@ -486,3 +486,11 @@ void VM::closeUpvalues(Value *last)
         openUpvalues = upvalue->next;
     }
 }
+
+void VM::markRoots()
+{
+    for (Value &v : stack)
+    {
+        gc.mark(v);
+    }
+}

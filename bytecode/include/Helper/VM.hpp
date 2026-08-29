@@ -1,5 +1,6 @@
 #include "types.hpp"
 #include "../../hashmap/include/Table.hpp"
+#include "../Memory.hpp"
 #include <iostream>
 #include <cstdint>
 #include <vector>
@@ -38,12 +39,16 @@ private:
 
     ObjUpvalue *openUpvalues = nullptr;
 
+    GarbageCollector gc;
+
     ObjString *copyString(const std::string &text);
     InterpretResult run();
     void runtimeError(const std::string &message);
     void defineNative(const std::string &name, NativeFn function);
     ObjUpvalue *captureUpvalue(Value *localSlot);
     void closeUpvalues(Value *last);
+
+    void markRoots();
 
 public:
     InterpretResult interpret(LoxFunction *script);
@@ -54,6 +59,8 @@ public:
         initTable(&globals);
         initTable(&strings);
         stack.reserve(STACK_MAX);
+        gc.setMarkRootsCallback([this]
+                                { markRoots(); });
 
         defineNative("clock", clockNative);
     }
