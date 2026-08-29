@@ -364,6 +364,7 @@ InterpretResult VM::run()
         }
         case (uint8_t)OpCode::OP_CLOSURE:
         {
+
             uint8_t constIndex = *frame->ip;
             frame->ip++;
             LoxFunction *fn = frame->closure->function->chunk.constants[constIndex].asFunction();
@@ -427,8 +428,9 @@ InterpretResult VM::interpret(LoxFunction *script)
 
 void VM::runtimeError(const std::string &message)
 {
-    size_t instructionIndex = (&frames.back())->ip - (&frames.back())->function->chunk.code.data() - 1;
-    int line = (&frames.back())->function->chunk.lines[instructionIndex];
+    CallFrame &frame = frames.back();
+    size_t instructionIndex = frame.ip - frame.closure->function->chunk.code.data() - 1;
+    int line = frame.closure->function->chunk.lines[instructionIndex];
     std::cerr << "[line " << line << "] Runtime Error: " << message << std::endl;
     stack.clear();
 }

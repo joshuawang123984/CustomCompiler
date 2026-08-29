@@ -5,6 +5,8 @@
 #include <vector>
 #include <unordered_map>
 
+#define STACK_MAX 1024
+
 class Chunk;
 
 enum class InterpretResult
@@ -51,6 +53,7 @@ public:
     {
         initTable(&globals);
         initTable(&strings);
+        stack.reserve(STACK_MAX);
 
         defineNative("clock", clockNative);
     }

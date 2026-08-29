@@ -98,8 +98,6 @@ void Compiler::compileFunction(FunctionType type, ObjString *nameObj)
 
     functionCompiler.function->name = nameObj;
 
-    functionCompiler.beginScope();
-
     functionCompiler.consume(TokenType::LEFT_PAREN, "Expect '(' after func name.");
     if (!functionCompiler.tokenVector.check(TokenType::RIGHT_PAREN))
     {
@@ -116,8 +114,6 @@ void Compiler::compileFunction(FunctionType type, ObjString *nameObj)
 
     functionCompiler.block();
     functionCompiler.emitReturn();
-
-    disassembleChunk(functionCompiler.function->chunk, "add (function body)"); // TEMP — just to verify
 
     uint8_t functionConstant = currentChunk()->addConstant(Value(functionCompiler.function));
     emitBytes((uint8_t)OpCode::OP_CLOSURE, functionConstant);
@@ -193,15 +189,19 @@ int Compiler::resolveLocal(const Token &name)
 }
 int Compiler::resolveUpvalue(const Token &name)
 {
+    std::cout << "resolveUpvalue(" << name.lexeme << "): enclosing=" << enclosing << std::endl;
     if (enclosing == nullptr)
+    {
+        std::cout << "  no enclosing, return -1\n";
         return -1;
+    }
 
     int local = enclosing->resolveLocal(name);
+    std::cout << "  enclosing->resolveLocal(" << name.lexeme << ") = " << local << std::endl;
     if (local != -1)
     {
         return addUpvalue((uint8_t)local, true);
     }
-
     return -1;
 }
 
@@ -348,9 +348,17 @@ void Compiler::variable(bool canAssign)
             emitBytes((uint8_t)OpCode::OP_SET_LOCAL, (uint8_t)slot);
         else
         {
-            ObjString *nameObj = copyString(identifier.lexeme);
-            int nameConstant = currentChunk()->addConstant(Value(nameObj));
-            emitBytes((uint8_t)OpCode::OP_SET_GLOBAL, (uint8_t)nameConstant);
+            int upvalueSlot = resolveUpvalue(identifier);
+            if (upvalueSlot != -1)
+            {
+                emitBytes((uint8_t)OpCode::OP_SET_UPVALUE, (uint8_t)upvalueSlot);
+            }
+            else
+            {
+                ObjString *nameObj = copyString(identifier.lexeme);
+                int nameConstant = currentChunk()->addConstant(Value(nameObj));
+                emitBytes((uint8_t)OpCode::OP_SET_GLOBAL, (uint8_t)nameConstant);
+            }
         }
         return;
     }
@@ -394,7 +402,6 @@ void Compiler::declaration()
 
 void Compiler::statement()
 {
-    Token token = tokenVector.previous();
     if (tokenVector.check(TokenType::PRINT))
     {
         advance();
@@ -422,6 +429,11 @@ void Compiler::statement()
     {
         advance();
         forStatement();
+    }
+    else if (tokenVector.check(TokenType::RETURN))
+    {
+        advance();
+        returnStatement();
     }
     else
     {
@@ -589,12 +601,14 @@ void Compiler::varDeclaration()
 }
 void Compiler::funcDeclaration()
 {
+
     consume(TokenType::IDENTIFIER, "Expect identifier after 'func'.");
     Token token = tokenVector.previous();
     ObjString *nameObj = copyString(token.lexeme);
     int nameConstant = currentChunk()->addConstant(Value(nameObj));
 
     compileFunction(FunctionType::TYPE_FUNCTION, nameObj);
+    std::cout << "funcDeclaration: name=" << token.lexeme << " scopeDepth=" << scopeDepth << std::endl;
 
     if (scopeDepth == 0)
     {

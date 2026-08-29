@@ -76,3 +76,17 @@ func outer() {
 }
 
 outer();
+
+func makeCounter() {
+    var count = 0;
+    func increment() {
+        count = count + 1;
+        return count;
+    }
+    return increment;
+}
+
+var counter = makeCounter();
+print counter();
+print counter();
+print counter();
