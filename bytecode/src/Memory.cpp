@@ -7,6 +7,11 @@ void GarbageCollector::setMarkRootsCallback(std::function<void()> fn)
 {
     markRootsFn = fn;
 }
+void GarbageCollector::setTableRemoveWhite(std::function<void()> fn)
+{
+    tableRemoveWhiteFn = fn;
+}
+
 void *GarbageCollector::reallocate(void *pointer, size_t oldSize, size_t newSize)
 {
     total_bytes += newSize - oldSize;
@@ -187,6 +192,7 @@ void GarbageCollector::collect()
 
     markRootsFn();
     traceReferences();
+    tableRemoveWhiteFn();
     sweep();
 
     std::cout << "-- ending gc --" << std::endl;

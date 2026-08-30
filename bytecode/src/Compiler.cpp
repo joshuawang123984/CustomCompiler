@@ -1,4 +1,5 @@
 #include "../include/Compiler.hpp"
+#include "../include/Memory.hpp"
 #include "../include/Helper/Obj.hpp"
 #include "../include/Helper/functions.hpp"
 #include "../hashmap/include/Table.hpp"
@@ -66,7 +67,7 @@ ObjString *Compiler::copyString(const std::string &text)
         return interned;
     }
 
-    ObjString *string = new ObjString(text);
+    ObjString *string = gc.allocateObject<ObjString>(text);
     string->hash = hash;
     tableSet(&strings, string, Value{});
 
@@ -79,21 +80,21 @@ ObjString *Compiler::copyString(const std::string &text)
     return string;
 }
 
-Compiler::Compiler(TokenVector &tokenVector, Table &strings)
-    : tokenVector(tokenVector), strings(strings), functionType(FunctionType::TYPE_SCRIPT)
+Compiler::Compiler(TokenVector &tokenVector, Table &strings, GarbageCollector &gc)
+    : tokenVector(tokenVector), strings(strings), gc(gc), functionType(FunctionType::TYPE_SCRIPT)
 {
-    function = new LoxFunction();
+    function = gc.allocateObject<LoxFunction>();
 }
 
-Compiler::Compiler(TokenVector &tokenVector, Table &strings, FunctionType type)
-    : tokenVector(tokenVector), strings(strings), functionType(type)
+Compiler::Compiler(TokenVector &tokenVector, Table &strings, GarbageCollector &gc, FunctionType type)
+    : tokenVector(tokenVector), strings(strings), gc(gc), functionType(type)
 {
-    function = new LoxFunction();
+    function = gc.allocateObject<LoxFunction>();
 }
 
 void Compiler::compileFunction(FunctionType type, ObjString *nameObj)
 {
-    Compiler functionCompiler(tokenVector, strings, type);
+    Compiler functionCompiler(tokenVector, strings, gc, type);
     functionCompiler.enclosing = this;
 
     functionCompiler.function->name = nameObj;

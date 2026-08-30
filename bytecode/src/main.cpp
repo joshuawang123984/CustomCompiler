@@ -43,7 +43,7 @@ void test(const std::string &source)
     }
 
     VM vm;
-    Compiler compiler(tokens, vm.getStrings());
+    Compiler compiler(tokens, vm.getStrings(), vm.getGC());
     bool ok = compiler.compile();
 
     if (ok)

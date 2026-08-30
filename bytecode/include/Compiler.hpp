@@ -27,6 +27,7 @@ enum class FunctionType
 };
 
 class Compiler;
+class GarbageCollector;
 struct Table;
 
 typedef void (Compiler::*ParseFn)(bool canAssign);
@@ -61,7 +62,9 @@ private:
 
     int scopeDepth = 0;
     std::vector<Local> locals;
+
     Table &strings;
+    GarbageCollector &gc;
 
     FunctionType functionType;
     LoxFunction *function;
@@ -121,8 +124,8 @@ private:
     Chunk *currentChunk() { return &function->chunk; }
 
 public:
-    Compiler(TokenVector &tokenVector, Table &strings);
-    Compiler(TokenVector &tokenVector, Table &strings, FunctionType type);
+    Compiler(TokenVector &tokenVector, Table &strings, GarbageCollector &gc);
+    Compiler(TokenVector &tokenVector, Table &strings, GarbageCollector &gc, FunctionType type);
 
     ObjString *copyString(const std::string &text);
     bool compile();

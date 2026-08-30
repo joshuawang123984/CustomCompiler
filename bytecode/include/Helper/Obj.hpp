@@ -30,7 +30,7 @@ struct ObjUpvalue : Obj
 {
     Value *location;
     Value closed;
-    ObjUpvalue *next = nullptr;
+    ObjUpvalue *nextOpen = nullptr;
 
     ObjUpvalue(Value *slot) : Obj(ObjType::OBJ_UPVALUE), location(slot) {}
 };

@@ -57,7 +57,8 @@ ObjString *VM::copyString(const std::string &text)
         return interned;
     }
 
-    ObjString *string = new ObjString(text);
+    ObjString *string = gc.allocateObject<ObjString>(text);
+    ;
     string->hash = hash;
     tableSet(&strings, string, Value{});
 
@@ -67,6 +68,10 @@ ObjString *VM::copyString(const std::string &text)
 Table &VM::getStrings()
 {
     return strings;
+}
+GarbageCollector &VM::getGC()
+{
+    return gc;
 }
 
 InterpretResult VM::run()
@@ -369,7 +374,7 @@ InterpretResult VM::run()
             frame->ip++;
             LoxFunction *fn = frame->closure->function->chunk.constants[constIndex].asFunction();
 
-            ObjClosure *closure = new ObjClosure(fn);
+            ObjClosure *closure = gc.allocateObject<ObjClosure>(fn);
 
             for (int i = 0; i < fn->upvalueCount; i++)
             {
@@ -414,7 +419,7 @@ InterpretResult VM::run()
 
 InterpretResult VM::interpret(LoxFunction *script)
 {
-    ObjClosure *closure = new ObjClosure(script);
+    ObjClosure *closure = gc.allocateObject<ObjClosure>(script);
 
     CallFrame frame;
     frame.closure = closure;
@@ -439,7 +444,7 @@ void VM::defineNative(const std::string &name, NativeFn function)
 {
     ObjString *nameObj = copyString(name);
     stack.push_back(Value(nameObj));
-    stack.push_back(Value(new ObjNative(function)));
+    stack.push_back(Value(gc.allocateObject<ObjNative>(function)));
     tableSet(&globals, nameObj, stack[stack.size() - 1]);
     stack.pop_back();
     stack.pop_back();
@@ -453,7 +458,7 @@ ObjUpvalue *VM::captureUpvalue(Value *localSlot)
     while (current != nullptr && current->location > localSlot)
     {
         prev = current;
-        current = current->next;
+        current = current->nextOpen;
     }
 
     if (current != nullptr && current->location > localSlot)
@@ -461,7 +466,7 @@ ObjUpvalue *VM::captureUpvalue(Value *localSlot)
         return current;
     }
 
-    ObjUpvalue *created = new ObjUpvalue(localSlot);
+    ObjUpvalue *created = gc.allocateObject<ObjUpvalue>(localSlot);
     created->next = current;
 
     if (prev == nullptr)
@@ -483,7 +488,7 @@ void VM::closeUpvalues(Value *last)
         ObjUpvalue *upvalue = openUpvalues;
         upvalue->closed = *upvalue->location;
         upvalue->location = &upvalue->closed;
-        openUpvalues = upvalue->next;
+        openUpvalues = upvalue->nextOpen;
     }
 }
 
@@ -510,6 +515,18 @@ void VM::markRoots()
     while (current)
     {
         gc.mark(current);
-        current = current->next;
+        current = current->nextOpen;
+    }
+}
+
+void VM::tableRemoveWhite(Table *strings)
+{
+    for (int i = 0; i < strings->capacity; ++i)
+    {
+        Entry &entry = strings->entries[i];
+        if (entry.key != NULL && !entry.key->isMarked)
+        {
+            tableDelete(strings, entry.key);
+        }
     }
 }

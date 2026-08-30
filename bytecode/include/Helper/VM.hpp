@@ -48,10 +48,12 @@ private:
     void closeUpvalues(Value *last);
 
     void markRoots();
+    void tableRemoveWhite(Table *strings);
 
 public:
     InterpretResult interpret(LoxFunction *script);
     Table &getStrings();
+    GarbageCollector &getGC();
 
     VM()
     {
@@ -60,6 +62,8 @@ public:
         stack.reserve(STACK_MAX);
         gc.setMarkRootsCallback([this]
                                 { markRoots(); });
+        gc.setTableRemoveWhite([this]
+                               { tableRemoveWhite(&strings); });
 
         defineNative("clock", clockNative);
     }

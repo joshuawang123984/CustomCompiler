@@ -90,3 +90,9 @@ var counter = makeCounter();
 print counter();
 print counter();
 print counter();
+
+
+//for gc
+for (var i = 0; i < 500; i = i + 1) {
+    var s = "temp" + i;
+}
