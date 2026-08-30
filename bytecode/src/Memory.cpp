@@ -134,6 +134,46 @@ void GarbageCollector::traceReferences()
 }
 void GarbageCollector::sweep()
 {
+    Obj *previous = nullptr;
+    Obj *current = objects;
+
+    while (current != nullptr)
+    {
+        if (current->isMarked)
+        {
+            current->isMarked = false;
+            previous = current;
+            current = current->next;
+        }
+        else
+        {
+            Obj *unreached = current;
+            if (previous != nullptr)
+            {
+                previous->next = current->next;
+                current = current->next;
+            }
+            else
+            {
+                current = current->next;
+                objects = current;
+            }
+
+            delete unreached;
+        }
+    }
+}
+void GarbageCollector::freeObjects()
+{
+    Obj *current = objects;
+    while (current)
+    {
+        Obj *toDelete = current;
+        current = current->next;
+        delete toDelete;
+    }
+
+    objects = nullptr;
 }
 void GarbageCollector::collect()
 {

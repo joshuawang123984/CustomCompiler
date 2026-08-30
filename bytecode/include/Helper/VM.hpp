@@ -20,7 +20,6 @@ enum class InterpretResult
 struct CallFrame
 {
     ObjClosure *closure;
-    LoxFunction *function;
     uint8_t *ip;
     size_t slotStart;
 };
@@ -69,5 +68,6 @@ public:
     {
         freeTable(&globals);
         freeTable(&strings);
+        gc.freeObjects();
     }
 };

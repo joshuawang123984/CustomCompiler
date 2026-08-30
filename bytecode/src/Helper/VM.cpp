@@ -489,8 +489,27 @@ void VM::closeUpvalues(Value *last)
 
 void VM::markRoots()
 {
-    for (Value &v : stack)
+    for (const Value &v : stack)
     {
         gc.mark(v);
+    }
+
+    for (int i = 0; i < globals.capacity; i++)
+    {
+        Entry &entry = globals.entries[i];
+        gc.mark(entry.key);
+        gc.mark(entry.value.value());
+    }
+
+    for (const CallFrame &frame : frames)
+    {
+        gc.mark(frame.closure);
+    }
+
+    ObjUpvalue *current = openUpvalues;
+    while (current)
+    {
+        gc.mark(current);
+        current = current->next;
     }
 }

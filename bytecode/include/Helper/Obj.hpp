@@ -18,6 +18,7 @@ enum class ObjType
 struct Obj
 {
     ObjType type;
+    Obj *next = nullptr;
     bool isMarked = false;
     virtual ~Obj() = default;
 

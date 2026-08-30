@@ -14,9 +14,8 @@ public:
     void *reallocate(void *pointer, size_t oldSize, size_t newSize);
     void mark(Value value);
     void mark(Obj *object);
-    void blackenObject(Obj *object);
-    void traceReferences();
-    void sweep();
+
+    void freeObjects();
 
     void collect();
 
@@ -26,4 +25,9 @@ private:
     size_t total_bytes = 0;
 
     std::vector<Obj *> grayStack;
+    Obj *objects = nullptr;
+
+    void blackenObject(Obj *object);
+    void traceReferences();
+    void sweep();
 };
