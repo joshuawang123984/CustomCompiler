@@ -18,6 +18,7 @@ enum class ObjType
 struct Obj
 {
     ObjType type;
+    bool isMarked = false;
     virtual ~Obj() = default;
 
 protected:

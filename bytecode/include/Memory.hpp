@@ -1,4 +1,9 @@
 #include <cstddef>
+#include <functional>
+#include <vector>
+
+struct Obj;
+struct Value;
 
 #define DEBUG_STRESS_GC
 
@@ -9,13 +14,16 @@ public:
     void *reallocate(void *pointer, size_t oldSize, size_t newSize);
     void mark(Value value);
     void mark(Obj *object);
+    void blackenObject(Obj *object);
     void traceReferences();
     void sweep();
 
     void collect();
 
 private:
-    std::function<void()> markRootsFn;
+    std::function<void()> markRootsFn = nullptr;
     size_t threshold = 512 * 512;
     size_t total_bytes = 0;
+
+    std::vector<Obj *> grayStack;
 };
