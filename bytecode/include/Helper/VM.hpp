@@ -40,6 +40,7 @@ private:
 
     GarbageCollector gc;
 
+    void concatenate(ObjString *a, ObjString *b);
     ObjString *copyString(const std::string &text);
     InterpretResult run();
     void runtimeError(const std::string &message);

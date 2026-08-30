@@ -6,7 +6,7 @@ struct Obj;
 struct Value;
 struct Table;
 
-// #define DEBUG_STRESS_GC
+#define DEBUG_STRESS_GC
 
 class GarbageCollector
 {
@@ -14,6 +14,16 @@ public:
     template <typename T, typename... Args>
     T *allocateObject(Args &&...args)
     {
+        total_bytes += sizeof(T);
+
+        if (total_bytes > threshold)
+        {
+            collect();
+        }
+#ifdef DEBUG_STRESS_GC
+        collect();
+#endif
+
         T *object = new T(std::forward<Args>(args)...);
         object->next = objects;
         objects = object;
@@ -35,7 +45,7 @@ private:
     std::function<void()> markRootsFn = nullptr;
     std::function<void()> tableRemoveWhiteFn = nullptr;
 
-    size_t threshold = 512 * 512;
+    size_t threshold = 2048 * 2048;
     size_t total_bytes = 0;
 
     std::vector<Obj *> grayStack;

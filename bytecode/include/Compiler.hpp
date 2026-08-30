@@ -111,7 +111,7 @@ private:
     void emitBytes(uint8_t a, uint8_t b);
     void emitConstant(Value value);
     void emitReturn();
-    uint8_t emitJump(uint8_t opcode);
+    int emitJump(uint8_t opcode);
     void patchJump(int offset);
     void emitLoop(int loopStart);
 

@@ -47,6 +47,15 @@ Value clockNative(int argCount, Value *args)
     return Value((double)clock() / CLOCKS_PER_SEC);
 }
 
+void VM::concatenate(ObjString *a, ObjString *b)
+{
+
+    std::string result = a->chars + b->chars;
+    ObjString *concatenated = copyString(result);
+
+    stack.push_back(Value(concatenated));
+}
+
 ObjString *VM::copyString(const std::string &text)
 {
     uint32_t hash = hashString(text);
@@ -126,8 +135,13 @@ InterpretResult VM::run()
             Value a = stack.back();
             stack.pop_back();
 
-            if (a.type != ValueType::VAL_NUMBER || b.type != ValueType::VAL_NUMBER)
+            if (!(a.type == ValueType::VAL_NUMBER && b.type == ValueType::VAL_NUMBER))
             {
+                if (a.isString() && b.isString())
+                {
+                    concatenate(a.asString(), b.asString());
+                    break;
+                }
                 runtimeError("Operands must be numbers.");
                 return InterpretResult::INTERPRET_RUNTIME_ERROR;
             }
@@ -502,8 +516,15 @@ void VM::markRoots()
     for (int i = 0; i < globals.capacity; i++)
     {
         Entry &entry = globals.entries[i];
+        if (entry.key == nullptr || entry.key == TOMBSTONE)
+        {
+            continue;
+        }
         gc.mark(entry.key);
-        gc.mark(entry.value.value());
+        if (entry.value.has_value())
+        {
+            gc.mark(entry.value.value());
+        }
     }
 
     for (const CallFrame &frame : frames)

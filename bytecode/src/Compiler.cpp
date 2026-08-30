@@ -640,7 +640,7 @@ void Compiler::emitReturn()
     emitByte((uint8_t)OpCode::OP_RETURN);
 }
 
-uint8_t Compiler::emitJump(uint8_t opcode)
+int Compiler::emitJump(uint8_t opcode)
 {
     emitByte((uint8_t)opcode);
     emitBytes(0xFF, 0xFF);
@@ -750,4 +750,5 @@ void Compiler::endScope()
         emitByte((uint8_t)OpCode::OP_POP);
         locals.pop_back();
     }
+    std::cout << currentChunk()->code.size() << std::endl;
 }
