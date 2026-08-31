@@ -37,6 +37,9 @@ public:
     void mark(Value value);
     void mark(Obj *object);
 
+    void pinRoot(Obj *obj);
+    void unpinRoot(Obj *obj);
+
     void freeObjects();
 
     void collect();
@@ -50,6 +53,8 @@ private:
 
     std::vector<Obj *> grayStack;
     Obj *objects = nullptr;
+
+    std::vector<Obj *> pinnedRoots;
 
     void blackenObject(Obj *object);
     void traceReferences();

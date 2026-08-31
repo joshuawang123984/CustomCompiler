@@ -126,6 +126,7 @@ private:
 public:
     Compiler(TokenVector &tokenVector, Table &strings, GarbageCollector &gc);
     Compiler(TokenVector &tokenVector, Table &strings, GarbageCollector &gc, FunctionType type);
+    ~Compiler();
 
     ObjString *copyString(const std::string &text);
     bool compile();

@@ -94,5 +94,17 @@ print counter();
 
 //for gc
 for (var i = 0; i < 500; i = i + 1) {
-    var s = "temp" + i;
+    var s = "temp";
 }
+
+for (var i = 0; i < 5000; i = i + 1) {
+    var s = "junk" + "junk";
+}
+print "still alive";
+
+func countdown(n) {
+    if (n <= 0) return 0;
+    print n;
+    return countdown(n - 1);
+}
+countdown(5);

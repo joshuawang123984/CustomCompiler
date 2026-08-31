@@ -64,6 +64,23 @@ void GarbageCollector::mark(Obj *object)
     object->isMarked = true;
     grayStack.push_back(object);
 }
+
+void GarbageCollector::pinRoot(Obj *obj)
+{
+    pinnedRoots.push_back(obj);
+}
+void GarbageCollector::unpinRoot(Obj *obj)
+{
+    for (int i = pinnedRoots.size() - 1; i >= 0; --i)
+    {
+        if (pinnedRoots[i] == obj)
+        {
+            pinnedRoots.erase(pinnedRoots.begin() + i);
+            break;
+        }
+    }
+}
+
 void GarbageCollector::blackenObject(Obj *object)
 {
     switch (object->type)
@@ -191,6 +208,10 @@ void GarbageCollector::collect()
     std::cout << "-- starting gc --" << std::endl;
 
     markRootsFn();
+    for (Obj *obj : pinnedRoots)
+    {
+        mark(obj);
+    }
     traceReferences();
     tableRemoveWhiteFn();
     sweep();

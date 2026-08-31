@@ -389,6 +389,7 @@ InterpretResult VM::run()
             LoxFunction *fn = frame->closure->function->chunk.constants[constIndex].asFunction();
 
             ObjClosure *closure = gc.allocateObject<ObjClosure>(fn);
+            gc.pinRoot(closure);
 
             for (int i = 0; i < fn->upvalueCount; i++)
             {
@@ -407,6 +408,7 @@ InterpretResult VM::run()
                 }
             }
 
+            gc.unpinRoot(closure);
             stack.push_back(Value(closure));
             break;
         }
@@ -481,7 +483,7 @@ ObjUpvalue *VM::captureUpvalue(Value *localSlot)
     }
 
     ObjUpvalue *created = gc.allocateObject<ObjUpvalue>(localSlot);
-    created->next = current;
+    created->nextOpen = current;
 
     if (prev == nullptr)
     {
@@ -489,7 +491,7 @@ ObjUpvalue *VM::captureUpvalue(Value *localSlot)
     }
     else
     {
-        prev->next = created;
+        prev->nextOpen = created;
     }
 
     return created;

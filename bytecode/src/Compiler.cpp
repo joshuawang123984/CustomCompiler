@@ -84,12 +84,19 @@ Compiler::Compiler(TokenVector &tokenVector, Table &strings, GarbageCollector &g
     : tokenVector(tokenVector), strings(strings), gc(gc), functionType(FunctionType::TYPE_SCRIPT)
 {
     function = gc.allocateObject<LoxFunction>();
+    gc.pinRoot(function);
 }
 
 Compiler::Compiler(TokenVector &tokenVector, Table &strings, GarbageCollector &gc, FunctionType type)
     : tokenVector(tokenVector), strings(strings), gc(gc), functionType(type)
 {
     function = gc.allocateObject<LoxFunction>();
+    gc.pinRoot(function);
+}
+
+Compiler::~Compiler()
+{
+    gc.unpinRoot(function);
 }
 
 void Compiler::compileFunction(FunctionType type, ObjString *nameObj)
