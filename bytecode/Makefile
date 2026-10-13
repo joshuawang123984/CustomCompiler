@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Iinclude -Wall
+CXXFLAGS = -std=c++17 -Iinclude -Wall -O2 $(EXTRA)
 
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
